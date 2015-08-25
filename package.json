@@ -1,0 +1,30 @@
+{
+  "name": "generator-drupal-theme",
+  "version": "1.0.0",
+  "description": "Use Yeoman to generate a new Drupal theme",
+  "files": [
+    "generators"
+  ],
+  "main": "app/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/doostinharrell/generator-drupal-theme.git"
+  },
+  "keywords": [
+    "yeoman-generator"
+  ],
+  "author": "Dustin Harrell",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/doostinharrell/generator-drupal-theme/issues"
+  },
+  "homepage": "https://github.com/doostinharrell/generator-drupal-theme#readme",
+  "dependencies": {
+    "chalk": "^1.1.1",
+    "yeoman-generator": "^0.20.2",
+    "yosay": "^1.0.5"
+  }
+}
