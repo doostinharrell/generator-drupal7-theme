@@ -6,14 +6,11 @@ var gulp          = require('gulp'),
     concat        = require('gulp-concat'),
     flatten       = require('gulp-flatten'),
     ext           = require('gulp-ext-replace'),
-    nodesass      = require('node-sass'),
     sass          = require('gulp-sass'),
     globbing      = require('gulp-css-globbing'),
     autoprefixer  = require('gulp-autoprefixer'),
     minifycss     = require('gulp-minify-css'),
     sourcemaps    = require('gulp-sourcemaps'),
-    bowerfiles    = require('main-bower-files'),
-    browsersync   = require('browser-sync'),
     reload        = browsersync.reload;
 
 // JS Task

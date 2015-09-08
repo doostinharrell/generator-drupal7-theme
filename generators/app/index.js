@@ -17,17 +17,20 @@ module.exports = yeoman.generators.Base.extend({
       {
         type: 'input',
         name: 'themeHumanName',
-        message: 'Enter your theme\'s human readable name. (ie: Drupal Theme)'
+        message: 'Enter your theme\'s human readable name.',
+        default: 'Drupal Theme'
       },
       {
         type: 'input',
         name: 'themeMachineName',
-        message: 'Enter your theme\'s machine name. (ie: drupal_theme)'
+        message: 'Enter your theme\'s machine name.',
+        default: 'drupal_theme'
       },
       {
         type: 'input',
         name: 'proxyAddress',
-        message: 'Enter the website\'s local development url for browsersync. (ie: drupal-theme.dev)'
+        message: 'Enter your website\'s development url for browsersync.',
+        default: 'drupal.boi'
       }
     ];
 
@@ -40,71 +43,26 @@ module.exports = yeoman.generators.Base.extend({
   writing: {
     app: function () {
 
-      // Write theme.info
+      // Build drupal theme from templates
       this.fs.copyTpl(
-        this.templatePath('theme.info'),
-        this.destinationPath(this.props.themeMachineName + '/' + this.props.themeMachineName + '.info'),
-        {
-          themeHumanName: this.props.themeHumanName,
-          themeMachineName: this.props.themeMachineName,
-        }
+          this.templatePath('**'),
+          this.destinationPath(this.props.themeMachineName + '/'),
+          {
+            themeHumanName: this.props.themeHumanName,
+            themeMachineName: this.props.themeMachineName,
+            proxyAddress: this.props.proxyAddress
+          }
       );
 
-      // Write template.php
-      this.fs.copyTpl(
-        this.templatePath('template.php'),
-        this.destinationPath(this.props.themeMachineName + '/' + 'template.php'),
-        {
-          themeMachineName: this.props.themeMachineName,
-        }
+      // Rename drupal theme info file
+      this.fs.move(
+          this.destinationPath(this.props.themeMachineName + '/' + 'theme.info'),
+          this.destinationPath(this.props.themeMachineName + '/' + this.props.themeMachineName + '.info'),
+          {
+            themeMachineName: this.props.themeMachineName
+          }
       );
 
-      // Write bower.json
-      this.fs.copyTpl(
-        this.templatePath('bower.json'),
-        this.destinationPath(this.props.themeMachineName + '/' + 'bower.json'),
-        {
-          themeHumanName: this.props.themeHumanName,
-          themeMachineName: this.props.themeMachineName,
-        }
-      );
-
-      // Write package.json
-      this.fs.copyTpl(
-        this.templatePath('package.json'),
-        this.destinationPath(this.props.themeMachineName + '/' + 'package.json'),
-        {
-          themeHumanName: this.props.themeHumanName,
-          themeMachineName: this.props.themeMachineName,
-        }
-      );
-
-      // Write gulpfile.js
-      this.fs.copyTpl(
-        this.templatePath('gulpfile.js'),
-        this.destinationPath(this.props.themeMachineName + '/' + 'gulpfile.js'),
-        {
-          proxyAddress: this.props.proxyAddress,
-        }
-      );
-
-      // Create build directory
-      this.fs.copy(
-        this.templatePath('build'),
-        this.destinationPath(this.props.themeMachineName + '/' + 'build')
-      );
-
-      // Create dev directory
-      this.fs.copy(
-        this.templatePath('dev'),
-        this.destinationPath(this.props.themeMachineName + '/' + 'dev')
-      );
-
-      // Create templates directory
-      this.fs.copy(
-        this.templatePath('templates'),
-        this.destinationPath(this.props.themeMachineName + '/' + 'templates')
-      );
     }
   },
 

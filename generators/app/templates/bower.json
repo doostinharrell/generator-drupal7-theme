@@ -1,0 +1,18 @@
+{
+  "name": "<%= themeMachineName %>",
+  "version": "1.0.0",
+  "authors": [
+    "Dustin Harrell"
+  ],
+  "license": "ISC",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "foundation": "~5.5.2"
+  }
+}

@@ -1,0 +1,10 @@
+// Import foundation installed via bower.
+@import "../../bower_components/foundation/scss/foundation";
+@import "../../bower_components/foundation/scss/normalize";
+
+// Import customized stylesheets organized as per SMACSS documentation.
+@import "base";
+@import "layout";
+@import "module";
+@import "state";
+@import "theme";
