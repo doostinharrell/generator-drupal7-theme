@@ -45,13 +45,19 @@ module.exports = yeoman.generators.Base.extend({
 
       // Build drupal theme from templates
       this.fs.copyTpl(
-          this.templatePath('**'),
+          this.templatePath('tpl'),
           this.destinationPath(this.props.themeMachineName + '/'),
           {
             themeHumanName: this.props.themeHumanName,
             themeMachineName: this.props.themeMachineName,
             proxyAddress: this.props.proxyAddress
           }
+      );
+
+      // Copy out static files. ie: files that don't require changes.
+      this.fs.copy(
+          this.templatePath('static'),
+          this.destinationPath(this.props.themeMachineName + '/')
       );
 
       // Rename drupal theme info file
