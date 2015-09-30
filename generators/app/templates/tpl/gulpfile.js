@@ -11,10 +11,35 @@ var gulp          = require('gulp'),
     autoprefixer  = require('gulp-autoprefixer'),
     minifycss     = require('gulp-minify-css'),
     sourcemaps    = require('gulp-sourcemaps'),
+    foundation    = 'bower_components/foundation/',
     reload        = browsersync.reload;
 
 // JS Task
 gulp.task('js', function() {
+  gulp.src(foundation + 'js/foundation.min.js')
+    .pipe(sourcemaps.init())
+    .pipe(uglify())
+    .pipe(sourcemaps.write('../maps/js'))
+    .pipe(gulp.dest('build/js'))
+
+  gulp.src(foundation + 'js/foundation/*.js')
+    .pipe(sourcemaps.init())
+    .pipe(uglify())
+    .pipe(sourcemaps.write('../maps/js'))
+    .pipe(gulp.dest('build/js/foundation'))
+
+  gulp.src(foundation + 'js/vendor/*.js')
+    .pipe(sourcemaps.init())
+    .pipe(uglify())
+    .pipe(sourcemaps.write('../maps/js'))
+    .pipe(gulp.dest('build/js/vendor'))
+
+  gulp.src('dev/js/behavior/*.js')
+    .pipe(sourcemaps.init())
+    .pipe(uglify())
+    .pipe(sourcemaps.write('../maps/js'))
+    .pipe(gulp.dest('build/js/behavior'))
+
   gulp.src('dev/js/functions.js')
     .pipe(sourcemaps.init())
     .pipe(uglify())

@@ -70,9 +70,37 @@
  * @see omega_preprocess_page()
  */
 ?>
+
+<!--.page -->
 <div class="l-page">
-  <header class="l-header" role="banner">
-    <div class="l-branding">
+
+  <?php if ($top_bar): ?>
+    <!--.top-bar -->
+    <?php if ($top_bar_classes): ?>
+      <div class="<?php print $top_bar_classes; ?>">
+    <?php endif; ?>
+    <nav class="top-bar"<?php print $top_bar_options; ?>>
+      <ul class="title-area">
+        <li class="name"><h1><?php print $linked_site_name; ?></h1></li>
+        <li class="toggle-topbar menu-icon"><a href="#"><span><?php print $top_bar_menu_text; ?></span></a></li>
+      </ul>
+      <section class="top-bar-section">
+        <?php if ($top_bar_main_menu) :?>
+          <?php print $top_bar_main_menu; ?>
+        <?php endif; ?>
+        <?php if ($top_bar_secondary_menu) :?>
+          <?php print $top_bar_secondary_menu; ?>
+        <?php endif; ?>
+      </section>
+    </nav>
+    <?php if ($top_bar_classes): ?>
+      </div>
+    <?php endif; ?>
+    <!--/.top-bar -->
+  <?php endif; ?>
+
+  <header class="l-header row" role="banner">
+    <div class="l-branding columns large-12">
       <?php if ($logo): ?>
         <a href="<?php print $front_page; ?>" title="<?php print t('Home'); ?>" rel="home" class="site-logo"><img src="<?php print $logo; ?>" alt="<?php print t('Home'); ?>" /></a>
       <?php endif; ?>
@@ -96,8 +124,19 @@
     <?php print render($page['navigation']); ?>
   </header>
 
-  <div class="l-main">
-    <div class="l-content" role="main">
+  <?php if ($messages && !$<%= themeMachineName %>_messages_modal): ?>
+    <!--.l-messages -->
+    <section class="l-messages row">
+      <div class="large-12 columns">
+        <?php if ($messages): print $messages; endif; ?>
+      </div>
+    </section>
+    <!--/.l-messages -->
+  <?php endif; ?>
+
+  <!--.l-main -->
+  <div class="l-main row">
+    <div class="l-content columns large-12" role="main">
       <?php print render($page['highlighted']); ?>
       <?php print $breadcrumb; ?>
       <a id="main-content"></a>
@@ -106,7 +145,6 @@
         <h1><?php print $title; ?></h1>
       <?php endif; ?>
       <?php print render($title_suffix); ?>
-      <?php print $messages; ?>
       <?php print render($tabs); ?>
       <?php print render($page['help']); ?>
       <?php if ($action_links): ?>
@@ -116,11 +154,29 @@
       <?php print $feed_icons; ?>
     </div>
 
-    <?php print render($page['sidebar_first']); ?>
-    <?php print render($page['sidebar_second']); ?>
-  </div>
+    <?php if (!empty($page['sidebar_first'])): ?>
+      <aside role="complementary" class="<?php print $sidebar_first_grid; ?> l-sidebar-first columns sidebar">
+        <?php print render($page['sidebar_first']); ?>
+      </aside>
+    <?php endif; ?>
 
-  <footer class="l-footer" role="contentinfo">
-    <?php print render($page['footer']); ?>
+    <?php if (!empty($page['sidebar_second'])): ?>
+      <aside role="complementary" class="<?php print $sidebar_sec_grid; ?> l-sidebar-second columns sidebar">
+        <?php print render($page['sidebar_second']); ?>
+      </aside>
+    <?php endif; ?>
+  </div>
+  <!--/.l-main -->
+
+  <!--.l-footer -->
+  <footer class="l-footer row" role="contentinfo">
+    <div class="columns large-12">
+      <?php print render($page['footer']); ?>
+    </div>
   </footer>
+  <!--/.l-footer -->
+
+  <?php if ($messages && $<%= themeMachineName %>_messages_modal): print $messages; endif; ?>
+
 </div>
+<!--/.page -->
