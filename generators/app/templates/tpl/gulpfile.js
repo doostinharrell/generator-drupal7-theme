@@ -20,25 +20,25 @@ gulp.task('js', function() {
     .pipe(sourcemaps.init())
     .pipe(uglify())
     .pipe(sourcemaps.write('../maps/js'))
-    .pipe(gulp.dest('build/js'))
+    .pipe(gulp.dest('build/js'));
 
   gulp.src(foundation + 'js/foundation/*.js')
     .pipe(sourcemaps.init())
     .pipe(uglify())
     .pipe(sourcemaps.write('../maps/js'))
-    .pipe(gulp.dest('build/js/foundation'))
+    .pipe(gulp.dest('build/js/foundation'));
 
   gulp.src(foundation + 'js/vendor/*.js')
     .pipe(sourcemaps.init())
     .pipe(uglify())
     .pipe(sourcemaps.write('../maps/js'))
-    .pipe(gulp.dest('build/js/vendor'))
+    .pipe(gulp.dest('build/js/vendor'));
 
   gulp.src('dev/js/behavior/*.js')
     .pipe(sourcemaps.init())
     .pipe(uglify())
     .pipe(sourcemaps.write('../maps/js'))
-    .pipe(gulp.dest('build/js/behavior'))
+    .pipe(gulp.dest('build/js/behavior'));
 
   gulp.src('dev/js/functions.js')
     .pipe(sourcemaps.init())
@@ -46,7 +46,7 @@ gulp.task('js', function() {
     .pipe(concat({ path: 'functions.js', stat: {mode: 0666} }))
     .pipe(sourcemaps.write('../maps/js'))
     .pipe(gulp.dest('build/js'))
-})
+});
 
 // Sass Task
 gulp.task('sass', function() {
@@ -61,7 +61,7 @@ gulp.task('sass', function() {
 
     // Reload browser
     .pipe(reload({stream: true}))
-})
+});
 
 // Browser Sync
 gulp.task('browser-sync', function() {
@@ -75,15 +75,15 @@ gulp.task('browser-sync', function() {
       }
     }
   })
-})
+});
 
 // Watch for changes
 gulp.task('watch', function(){
   gulp.watch('dev/**/*', ['js', 'sass'])
-})
+});
 
 // Build project.
-gulp.task('build', ['js', 'sass'])
+gulp.task('build', ['js', 'sass']);
 
 // Run run browser-sync and watch for changes
-gulp.task('default', ['browser-sync', 'watch'])
+gulp.task('default', ['browser-sync', 'watch']);
