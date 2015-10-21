@@ -2,6 +2,12 @@
 @import "../../bower_components/foundation/scss/foundation";
 @import "../../bower_components/foundation/scss/normalize";
 
+// Import mixins.
+@import "mixins/mixins";
+
+// Import variables.
+@import "variables/variables";
+
 // Import customized stylesheets organized as per SMACSS documentation.
 @import "base/base";
 @import "layout/layout";

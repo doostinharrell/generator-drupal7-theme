@@ -79,9 +79,16 @@
     <?php if ($top_bar_classes): ?>
       <div class="<?php print $top_bar_classes; ?>">
     <?php endif; ?>
-    <nav class="top-bar"<?php print $top_bar_options; ?>>
+    <nav class="top-bar"<?php print $top_bar_options; ?> data-topbar role="navigation">
       <ul class="title-area">
-        <li class="name"><h1><?php print $linked_site_name; ?></h1></li>
+        <li class="logo">
+          <?php if ($logo): ?>
+            <a href="<?php print $front_page; ?>" title="<?php print t('Home'); ?>" rel="home" class="site-logo"><img src="<?php print $logo; ?>" alt="<?php print t('Home'); ?>" /></a>
+          <?php endif; ?>
+        </li>
+        <li class="name">
+          <span><?php print $linked_site_name; ?></span>
+        </li>
         <li class="toggle-topbar menu-icon"><a href="#"><span><?php print $top_bar_menu_text; ?></span></a></li>
       </ul>
       <section class="top-bar-section">
@@ -100,31 +107,33 @@
   <?php endif; ?>
 
   <header class="l-header row" role="banner">
-    <div class="l-branding columns large-12">
-      <?php if ($logo): ?>
-        <a href="<?php print $front_page; ?>" title="<?php print t('Home'); ?>" rel="home" class="site-logo"><img src="<?php print $logo; ?>" alt="<?php print t('Home'); ?>" /></a>
-      <?php endif; ?>
-
-      <?php if ($site_name || $site_slogan): ?>
-        <?php if ($site_name): ?>
-          <h1 class="site-name">
-            <a href="<?php print $front_page; ?>" title="<?php print t('Home'); ?>" rel="home"><span><?php print $site_name; ?></span></a>
-          </h1>
+    <?php if (!$top_bar): ?>
+      <div class="l-branding columns large-12">
+        <?php if ($logo): ?>
+          <a href="<?php print $front_page; ?>" title="<?php print t('Home'); ?>" rel="home" class="site-logo"><img src="<?php print $logo; ?>" alt="<?php print t('Home'); ?>" /></a>
         <?php endif; ?>
 
-        <?php if ($site_slogan): ?>
-          <h2 class="site-slogan"><?php print $site_slogan; ?></h2>
-        <?php endif; ?>
-      <?php endif; ?>
+        <?php if ($site_name || $site_slogan): ?>
+          <?php if ($site_name): ?>
+            <h1 class="site-name">
+              <a href="<?php print $front_page; ?>" title="<?php print t('Home'); ?>" rel="home"><span><?php print $site_name; ?></span></a>
+            </h1>
+          <?php endif; ?>
 
-      <?php print render($page['branding']); ?>
-    </div>
+          <?php if ($site_slogan): ?>
+            <h2 class="site-slogan"><?php print $site_slogan; ?></h2>
+          <?php endif; ?>
+        <?php endif; ?>
+
+        <?php print render($page['branding']); ?>
+      </div>
+    <?php endif; ?>
 
     <?php print render($page['header']); ?>
     <?php print render($page['navigation']); ?>
   </header>
 
-  <?php if ($messages && !$<%= themeMachineName %>_messages_modal): ?>
+  <?php if ($messages && !$drupal_theme_messages_modal): ?>
     <!--.l-messages -->
     <section class="l-messages row">
       <div class="large-12 columns">
@@ -176,7 +185,7 @@
   </footer>
   <!--/.l-footer -->
 
-  <?php if ($messages && $<%= themeMachineName %>_messages_modal): print $messages; endif; ?>
+  <?php if ($messages && $drupal_theme_messages_modal): print $messages; endif; ?>
 
 </div>
 <!--/.page -->

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Omega's implementation to display a block.
+ * Default theme implementation to display a block.
  *
  * Available variables:
  * - $block->subject: Block title.
@@ -44,15 +44,15 @@
  * @ingroup themeable
  */
 ?>
-<div<?php print $attributes; ?> class="block">
-  <div class="block__title">
-    <?php print render($title_prefix); ?>
-    <?php if ($block->subject): ?>
-      <h2<?php print $title_attributes; ?>><?php print $block->subject; ?></h2>
-    <?php endif; ?>
-    <?php print render($title_suffix); ?>
-  </div>
-  <div class="block__content" <?php print $content_attributes; ?>>
-    <?php print $content; ?>
+<div id="<?php print $block_html_id; ?>" class="<?php print $classes; ?>"<?php print $attributes; ?>>
+
+  <?php print render($title_prefix); ?>
+  <?php if ($block->subject): ?>
+    <h2<?php print $title_attributes; ?>><?php print $block->subject ?></h2>
+  <?php endif;?>
+  <?php print render($title_suffix); ?>
+
+  <div class="content"<?php print $content_attributes; ?>>
+    <?php print $content ?>
   </div>
 </div>

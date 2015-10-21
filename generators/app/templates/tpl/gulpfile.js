@@ -15,24 +15,19 @@ var gulp          = require('gulp'),
     reload        = browsersync.reload;
 
 // JS Task
-gulp.task('js', function() {
+gulp.task('js', function () {
   gulp.src(foundation + 'js/foundation.min.js')
     .pipe(sourcemaps.init())
     .pipe(uglify())
     .pipe(sourcemaps.write('../maps/js'))
     .pipe(gulp.dest('build/js'));
 
-  gulp.src(foundation + 'js/foundation/*.js')
+  gulp.src([foundation + 'js/vendor/*.js', !foundation + 'js/vendor/jquery.js'])
     .pipe(sourcemaps.init())
     .pipe(uglify())
+    .pipe(concat({path: 'foundation-vendor.js', stat: {mode: 0666}}))
     .pipe(sourcemaps.write('../maps/js'))
-    .pipe(gulp.dest('build/js/foundation'));
-
-  gulp.src(foundation + 'js/vendor/*.js')
-    .pipe(sourcemaps.init())
-    .pipe(uglify())
-    .pipe(sourcemaps.write('../maps/js'))
-    .pipe(gulp.dest('build/js/vendor'));
+    .pipe(gulp.dest('build/js'));
 
   gulp.src('dev/js/behavior/*.js')
     .pipe(sourcemaps.init())
@@ -43,7 +38,7 @@ gulp.task('js', function() {
   gulp.src('dev/js/functions.js')
     .pipe(sourcemaps.init())
     .pipe(uglify())
-    .pipe(concat({ path: 'functions.js', stat: {mode: 0666} }))
+    .pipe(concat({path: 'functions.js', stat: {mode: 0666}}))
     .pipe(sourcemaps.write('../maps/js'))
     .pipe(gulp.dest('build/js'))
 });
