@@ -1,0 +1,8 @@
+// Prevent menu flash on page load for mobile.
+@include breakpoint(medium down) {
+	html.no-js {
+		.top-bar .top-bar-right {
+			display: none;
+		}
+	}
+}

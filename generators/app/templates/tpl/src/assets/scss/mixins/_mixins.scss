@@ -1,0 +1,98 @@
+// heading font sizes function
+// example: font-size: header-size(medium, h1);
+@function header-size($breakpoint, $size) {
+	@return rem-calc(map-get(map-get($header-sizes, $breakpoint), $size) * 1px);
+}
+
+@mixin header-size-responsive($size) {
+	font-size: header-size(small, $size);
+	@include breakpoint(medium) {
+		font-size: header-size(medium, $size);
+	}
+	@include breakpoint(large) {
+		font-size: header-size(large, $size);
+	}
+}
+
+@function gutter-size($breakpoint) {
+	@return map-get($grid-column-gutter, $breakpoint);
+}
+
+@mixin gutter-size-responsive($half: false) {
+	@if $half {
+		padding: 0 gutter-size(small)/2;
+		@include breakpoint(medium) {
+			padding: 0 gutter-size(medium)/2;
+		}
+	} @else {
+		padding: 0 gutter-size(small);
+		@include breakpoint(medium) {
+			padding: 0 gutter-size(medium);
+		}
+	}
+}
+
+@mixin remove-outline() {
+	outline: none;
+	outline-color: transparent;
+	outline-style: none;
+	-webkit-appearance: none;
+	&:focus {
+		outline: none;
+		outline-color: transparent;
+		outline-style: none;
+		-webkit-appearance: none;
+	}
+}
+
+// transition mixin
+@mixin transition($args: all .25s ease-in-out) {
+	-webkit-transition: $args;
+	-moz-transition: $args;
+	-ms-transition: $args;
+	-o-transition: $args;
+	transition: $args;
+}
+
+// box-shadow
+@mixin box-shadow($top, $left, $blur, $spread, $color, $inset: false) {
+	@if $inset {
+		-webkit-box-shadow:inset $top $left $blur $spread $color;
+		-moz-box-shadow:inset $top $left $blur $spread $color;
+		box-shadow:inset $top $left $blur $spread $color;
+	} @else {
+		-webkit-box-shadow: $top $left $blur $spread $color;
+		-moz-box-shadow: $top $left $blur $spread $color;
+		box-shadow: $top $left $blur $spread $color;
+	}
+}
+
+// Margin / Padding class mixin
+@mixin generate-spacing-classes(
+	$default-space-amounts-with-direction: (1 left l, 2 left l, 3 left l, 4 left l, 5 left l)
+)
+{
+	@each $space in $default-space-amounts-with-direction {
+		.m#{nth($space, 3)}-#{nth($space, 1)} {
+			margin-#{nth($space, 2)}: #{nth($space, 1)}rem;
+		}
+		.m-#{nth($space, 1)} {
+			margin: #{nth($space, 1)}rem;
+		}
+		.p#{nth($space, 3)}-#{nth($space, 1)} {
+			padding-#{nth($space, 2)}: #{nth($space, 1)}rem;
+		}
+		.p-#{nth($space, 1)} {
+			padding: #{nth($space, 1)}rem;
+		}
+	}
+}
+
+$right-space-vars: (1 right r, 2 right r, 3 right r, 4 right r, 5 right r);
+$bottom-space-vars: (1 bottom b, 2 bottom b, 3 bottom b, 4 bottom b, 5 bottom b);
+$top-space-vars: (1 top t, 2 top t, 3 top t, 4 top t, 5 top t);
+
+@include generate-spacing-classes(); // left comes by default
+@include generate-spacing-classes($right-space-vars);
+@include generate-spacing-classes($bottom-space-vars);
+@include generate-spacing-classes($top-space-vars);

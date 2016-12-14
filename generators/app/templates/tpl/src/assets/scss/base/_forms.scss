@@ -1,0 +1,11 @@
+// Default form styles
+input, button, select, textarea {
+	@include remove-outline;
+	@include transition();
+}
+
+input[type="submit"] {
+	@extend .button;
+	@extend .primary;
+	margin-right: .5rem;
+}
