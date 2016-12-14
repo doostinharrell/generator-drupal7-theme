@@ -1,0 +1,45 @@
+body.logged-in {
+
+	// Panels IPE Style Overrides
+	ul.panels-ipe-linkbar {
+		margin: 0;
+		li {
+			list-style: none;
+			display: inline-block;
+		}
+	}
+
+	div.panels-ipe-placeholder h3 {
+		width: auto;
+	}
+
+	.panels-ipe-dragbar-admin-title {
+		color: $black;
+	}
+
+	.panels-ipe-editing .panels-ipe-portlet-content {
+		margin: 0;
+	}
+
+	.panels-ipe-editing .panels-ipe-region {
+		float: none;
+	}
+
+	// Ctools Modal Overrides
+	.ui-dialog.media-wrapper {
+		z-index: 9999999999;
+	}
+	.ctools-modal-content {
+		a.button {
+			margin-right: .5rem;
+		}
+		.draggable a.tabledrag-handle {
+
+		}
+		a.tabledrag-handle .handle {
+			height: 2rem;
+			width: 2rem;
+		}
+	}
+
+}

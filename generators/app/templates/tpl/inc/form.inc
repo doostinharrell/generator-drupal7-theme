@@ -23,24 +23,14 @@ function <%= themeMachineName %>_form_alter(&$form, &$form_state, $form_id) {
 
   // Sexy submit buttons
   if (!empty($form['actions']) && !empty($form['actions']['submit'])) {
-    $form['actions']['submit']['#attributes']['class'] [] = 'secondary';
-    $form['actions']['submit']['#attributes']['class'] [] = 'button';
-    $form['actions']['submit']['#attributes']['class'] [] = 'radius';
+    $form['actions']['submit']['#attributes']['class'][] = 'secondary';
+    $form['actions']['submit']['#attributes']['class'][] = 'button';
+    $form['actions']['submit']['#attributes']['class'][] = 'radius';
   }
-
-  // Search Block Fixes
-  if (isset($form['#form_id']) && ($form['#form_id'] == 'search_block_form')) {
-    $form['search_block_form']['#attributes']['class'] [] = 'small-8';
-    $form['search_block_form']['#attributes']['class'] [] = 'columns';
-
-    $form['actions']['submit']['#attributes']['class'] [] = 'postfix';
-    $form['actions']['submit']['#attributes']['class'] [] = 'small-4';
-    $form['actions']['submit']['#attributes']['class'] [] = 'columns';
-  }
-
-  // Mantain compatibility with Edit module.
-  if ($form_id === 'edit_field_form') {
-    $form['actions']['submit']['#attributes']['class'][] = 'edit-form-submit';
+  if (!empty($form['basic']) && !empty($form['basic']['submit'])) {
+    $form['basic']['submit']['#attributes']['class'][] = 'secondary';
+    $form['basic']['submit']['#attributes']['class'][] = 'button';
+    $form['basic']['submit']['#attributes']['class'][] = 'radius';
   }
 
   // Add tooltips to form elements.
@@ -67,101 +57,4 @@ function <%= themeMachineName %>_form_alter(&$form, &$form_state, $form_id) {
       }
     }
   }
-}
-
-/**
- * Implements theme_form_element_label().
- */
-function <%= themeMachineName %>_form_element_label($variables) {
- _<%= themeMachineName %>_add_tooltips($variables);
- return theme_form_element_label($variables);
-}
-
-/**
- * Implements theme_text_format_wrapper().
- */
-function <%= themeMachineName %>_text_format_wrapper($variables) {
-  _<%= themeMachineName %>_add_tooltips($variables);
-  return theme_text_format_wrapper($variables);
-}
-
-/**
- * Implements theme_field_multiple_value_form().
- */
-function <%= themeMachineName %>_field_multiple_value_form($variables) {
-  _<%= themeMachineName %>_add_tooltips($variables);
-  return theme_field_multiple_value_form($variables);
-}
-
-/**
- * Modifies description to display the description in a tooltip.
- */
-function _<%= themeMachineName %>_add_tooltips(&$variables) {
-  // Don't do this if tooltips were turned off in settings.
-  if (!theme_get_setting('<%= themeMachineName %>_tooltip_enable')) {
-    return;
-  }
-  if (!empty($variables['element']['#title']) && !empty($variables['element']['#description'])) {
-    $variables['element']['#title'] = '<label>' . $variables['element']['#title'] . '</label>';
-    $text = theme_get_setting('<%= themeMachineName %>_tooltip_text');
-    $position = theme_get_setting('<%= themeMachineName %>_tooltip_position');
-    $touch = theme_get_setting('<%= themeMachineName %>_tooltip_touch') ? 'data-options="disable-for-touch:true"' : '';
-    $variables['element']['#description'] = ' <span data-tooltip ' . $touch . 'class="has-tip ' . $position . '" title="' . check_plain(strip_tags($variables['element']['#description'])) . '">' . t($text) . '</span>';
-  }
-  else {
-    // Hide description field, we add it directly to the form element's
-    // "title" attribute.
-    $variables['element']['#description'] = '';
-  }
-}
-
-/**
- * Returns HTML for a button form element.
- */
-function <%= themeMachineName %>_button($variables) {
-  $element = $variables['element'];
-  $label = check_plain($element['#value']);
-  element_set_attributes($element, array('id', 'name', 'value', 'type'));
-
-  $element['#attributes']['class'][] = 'form-' . $element['#button_type'];
-  if (!empty($element['#attributes']['disabled'])) {
-    $element['#attributes']['class'][] = 'form-button-disabled';
-  }
-
-  // Prepare input whitelist - added to ensure ajax functions don't break
-  $whitelist = _<%= themeMachineName %>_element_whitelist();
-
-  if (isset($element['#id']) && in_array($element['#id'], $whitelist)) {
-    return '<input' . drupal_attributes($element['#attributes']) . ">\n"; // This line break adds inherent margin between multiple buttons
-  }
-  else {
-    return '<button' . drupal_attributes($element['#attributes']) . '>'. $label ."</button>\n"; // This line break adds inherent margin between multiple buttons
-  }
-}
-
-/**
- * Returns an array containing ids of any whitelisted drupal elements
- */
-function _<%= themeMachineName %>_element_whitelist() {
-/**
- * Why whitelist an element?
- * The reason is to provide a list of elements we wish to exclude
- * from certain modifications made by the bootstrap theme which
- * break core functionality - e.g. ajax.
- */
-  $whitelist = array(
-    'edit-refresh',
-    'edit-pass-pass1',
-    'edit-pass-pass2',
-    'panels-ipe-cancel',
-    'panels-ipe-customize-page',
-    'panels-ipe-save',
-    'panelizer-save-default',
-    'panelizer-ipe-revert',
-  );
-
-  // Allow other modules and themes to alter return value.
-  drupal_alter('<%= themeMachineName %>_element_whitelist', $whitelist);
-
-  return $whitelist;
 }

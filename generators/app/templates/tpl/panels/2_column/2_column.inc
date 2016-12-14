@@ -9,7 +9,7 @@ function <%= themeMachineName %>_2_column_panels_layouts() {
     'category' => t('<%= themeHumanName %>'),
     'icon' => 'panel.png',
     'theme' => '2_column',
-    'admin css' => 'panel.css',
+    'admin css' => '../panels-styles.css',
     'regions' => array(
       'header' => t('Header'),
       'column_1' => t('Column 1'),
@@ -17,4 +17,11 @@ function <%= themeMachineName %>_2_column_panels_layouts() {
     ),
   );
   return $items;
+}
+
+/**
+ * Implements template_preprocess_HOOK().
+ */
+function <%= themeMachineName %>_preprocess_2_column(&$variables, $hook) {
+  // do stuff
 }

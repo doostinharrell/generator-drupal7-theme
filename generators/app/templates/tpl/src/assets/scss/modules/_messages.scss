@@ -1,0 +1,51 @@
+// Message defaults
+.messages {
+	margin: 1rem auto;
+	padding: 1rem 1rem 1rem 3rem;
+	background: none;
+	border: none;
+	position: relative;
+	min-height: 3.5rem;
+	color: $white;
+	&:before {
+		@include fontawesome;
+		color: $white;
+		content: "\f071";
+		position: absolute;
+		top: 1rem;
+		left: 1rem;
+		height: 1rem;
+		width: 1rem;
+	}
+}
+.messages ul {
+	margin: 0 0 0 3rem;
+	padding: 0;
+}
+.messages li {
+	list-style-image: none;
+}
+
+// Status Messages
+.messages--status:before {
+	content: "\f058";
+}
+.messages--status, tr.ok {
+	background-color: $success-color;
+}
+
+// Warning Messages
+.messages--warning:before {
+	content: "\f071";
+}
+.messages--warning, tr.ok {
+	background-color: $warning-color;
+}
+
+// Error Messages
+.messages--error:before {
+	content: "\f057";
+}
+.messages--error, tr.ok {
+	background-color: $alert-color;
+}

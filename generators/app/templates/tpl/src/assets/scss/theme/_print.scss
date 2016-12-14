@@ -1,0 +1,8 @@
+@media print {
+	header.header,
+	footer.footer,
+	footer.footer--bottom,
+	nav, img {
+		display: none !important;
+	}
+}

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Implements theme_menu_local_tasks().
  */
@@ -7,13 +8,13 @@ function <%= themeMachineName %>_menu_local_tasks(&$variables) {
 
   if (!empty($variables['primary'])) {
     $variables['primary']['#prefix'] = '<h2 class="element-invisible">' . t('Primary tabs') . '</h2>';
-    $variables['primary']['#prefix'] .= '<ul class="button-group">';
+    $variables['primary']['#prefix'] .= '<ul class="menu">';
     $variables['primary']['#suffix'] = '</ul>';
     $output .= drupal_render($variables['primary']);
   }
   if (!empty($variables['secondary'])) {
     $variables['secondary']['#prefix'] = '<h2 class="element-invisible">' . t('Secondary tabs') . '</h2>';
-    $variables['secondary']['#prefix'] .= '<ul class="button-group">';
+    $variables['secondary']['#prefix'] .= '<ul class="menu">';
     $variables['secondary']['#suffix'] = '</ul>';
     $output .= drupal_render($variables['secondary']);
   }
@@ -27,7 +28,8 @@ function <%= themeMachineName %>_menu_local_tasks(&$variables) {
 function <%= themeMachineName %>_menu_local_task(&$variables) {
   $link = $variables['element']['#link'];
   $link_text = $link['title'];
-  $li_class = (!empty($variables['element']['#active']) ? ' class="active"' : '');
+  $link_class = !empty($variables['element']['#active']) ? 'primary' : 'secondary';
+  $li_class = !empty($variables['element']['#active']) ? ' class="active"' : '';
 
   if (!empty($variables['element']['#active'])) {
     // Add text to indicate active tab for non-visual users.
@@ -43,10 +45,9 @@ function <%= themeMachineName %>_menu_local_task(&$variables) {
   }
 
   // Add section tab styling
-  $link['localized_options']['attributes']['class'] = array('small', 'button', 'secondary');
+  $link['localized_options']['attributes']['class'] = array($link_class, 'small', 'button');
 
-  $output = '';
-  $output .= '<li' . $li_class . '>';
+  $output = '<li' . $li_class . '>';
   $output .= l($link_text, $link['href'], $link['localized_options']);
   $output .= "</li>\n";
   return  $output;

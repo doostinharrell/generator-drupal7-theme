@@ -1,0 +1,12 @@
+/// Creates a menu icon with a set width, height, number of bars, and colors. The mixin uses the height of the icon and the weight of the bars to determine spacing. <div class="docs-example-burger"></div>
+///
+/// @param {Color} $color [$black] - Color to use for the icon.
+/// @param {Color} $color-hover [$dark-gray] - Color to use when the icon is hovered over.
+/// @param {Number} $width [20px] - Width of the icon.
+/// @param {Number} $height [16px] - Height of the icon.
+/// @param {Number} $weight [2px] - Height of individual bars in the icon.
+/// @param {Number} $bars [3] - Number of bars in the icon.
+
+.menu-icon {
+	@include hamburger($color: $white, $color-hover: $white, $width: 30px, $height: 25px, $weight: 5px);
+}

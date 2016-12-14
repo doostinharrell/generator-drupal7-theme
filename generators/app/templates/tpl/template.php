@@ -1,789 +1,154 @@
 <?php
 
 /*
- * @file
+ * Include partials.
  */
-
-$files = array(
-  'elements.inc',
-  'form.inc',
-  'menu.inc',
-  'theme.inc',
-);
-
-function _<%= themeMachineName %>_load($files) {
-  $tp = drupal_get_path('theme', '<%= themeMachineName %>');
-  $file = '';
-  $dir = dirname(__FILE__);
-
-  // Check file path and '.inc' extension
-  foreach($files as $file) {
-    $file_path = $dir . '/inc/' . $file;
-    if (strpos($file,'.inc') > 0 && file_exists($file_path)) {
-      require_once($file_path);
-    }
-  }
-}
-
-_<%= themeMachineName %>_load($files);
+require_once dirname(__FILE__) . '/inc/form.inc';
+require_once dirname(__FILE__) . '/inc/menu.inc';
 
 /**
- * Implements hook_html_head_alter().
- */
-function <%= themeMachineName %>_html_head_alter(&$head_elements) {
-  // HTML5 charset declaration.
-  $head_elements['system_meta_content_type']['#attributes'] = array(
-    'charset' => 'utf-8',
-  );
-
-  // Optimize mobile viewport.
-  $head_elements['mobile_viewport'] = array(
-    '#type' => 'html_tag',
-    '#tag' => 'meta',
-    '#attributes' => array(
-      'name' => 'viewport',
-      'content' => 'width=device-width, maximum-scale = 1.0',
-    ),
-  );
-
-  // Remove image toolbar in IE.
-  $head_elements['ie_image_toolbar'] = array(
-    '#type' => 'html_tag',
-    '#tag' => 'meta',
-    '#attributes' => array(
-      'http-equiv' => 'ImageToolbar',
-      'content' => 'false',
-    ),
-  );
-}
-
-/**
- * Implements theme_breadrumb().
- *
- * Print breadcrumbs as a list, with separators.
- */
-function <%= themeMachineName %>_breadcrumb($variables) {
-  $breadcrumb = $variables['breadcrumb'];
-
-  if (!empty($breadcrumb)) {
-    // Provide a navigational heading to give context for breadcrumb links to
-    // screen-reader users. Make the heading invisible with .element-invisible.
-    $breadcrumbs = '<h2 class="element-invisible">' . t('You are here') . '</h2>';
-
-    $breadcrumbs .= '<ul class="breadcrumbs">';
-
-    foreach ($breadcrumb as $key => $value) {
-      $breadcrumbs .= '<li>' . $value . '</li>';
-    }
-
-    $title = strip_tags(drupal_get_title());
-    $breadcrumbs .= '<li class="current"><a href="#">' . $title. '</a></li>';
-    $breadcrumbs .= '</ul>';
-
-    return $breadcrumbs;
-  }
-}
-
-function <%= themeMachineName %>_field($variables) {
-  $output = '';
-
-  // Render the label, if it's not hidden.
-  if (!$variables['label_hidden']) {
-    $output .= '<div ' . $variables['title_attributes'] . '>' . $variables['label'] . ':&nbsp;</div>';
-  }
-
-  // Edit module requires some extra wrappers to work.
-  if (module_exists('edit')) {
-    $output .= '<div class="field-items"' . $variables['content_attributes'] . '>';
-    foreach ($variables['items'] as $delta => $item) {
-      $classes = 'field-item ' . ($delta % 2 ? 'odd' : 'even');
-      $output .= '<div class="' . $classes . '"' . $variables['item_attributes'][$delta] . '>' . drupal_render($item) . '</div>';
-    }
-    $output .= '</div>';
-  }
-  else {
-    foreach ($variables['items'] as $item) {
-      $output .= drupal_render($item);
-    }
-  }
-
-  // Render the top-level DIV.
-  $output = '<div class="' . $variables['classes'] . '"' . $variables['attributes'] . '>' . $output . '</div>';
-
-  return $output;
-}
-
-/**
- * Implements theme_field__field_type().
- */
-function <%= themeMachineName %>_field__taxonomy_term_reference($variables) {
-  $output = '';
-
-  // Render the label, if it's not hidden.
-  if (!$variables['label_hidden']) {
-    $output .= '<h2 class="field-label">' . $variables['label'] . ': </h2>';
-  }
-
-  // Render the items.
-  $output .= ($variables['element']['#label_display'] == 'inline') ? '<ul class="links inline">' : '<ul class="links">';
-  foreach ($variables['items'] as $delta => $item) {
-    $output .= '<li class="taxonomy-term-reference-' . $delta . '"' . $variables['item_attributes'][$delta] . '>' . drupal_render($item) . '</li>';
-  }
-  $output .= '</ul>';
-
-  // Render the top-level DIV.
-  $output = '<div class="' . $variables['classes'] . (!in_array('clearfix', $variables['classes_array']) ? ' clearfix' : '') . '">' . $output . '</div>';
-
-  return $output;
-}
-
-/**
- * Implements theme_links() targeting the main menu specifically.
- * Formats links for Top Bar http://foundation.zurb.com/docs/components/top-bar.html
- */
-function <%= themeMachineName %>_links__topbar_main_menu($variables) {
-  // We need to fetch the links ourselves because we need the entire tree.
-  $links = menu_tree_output(menu_tree_all_data(variable_get('menu_main_links_source', 'main-menu')));
-  $output = _<%= themeMachineName %>_links($links);
-  $variables['attributes']['class'][] = 'left';
-
-  return '<ul' . drupal_attributes($variables['attributes']) . '>' . $output . '</ul>';
-}
-
-/**
- * Implements theme_links() targeting the secondary menu specifically.
- * Formats links for Top Bar http://foundation.zurb.com/docs/components/top-bar.html
- */
-function <%= themeMachineName %>_links__topbar_secondary_menu($variables) {
-  // We need to fetch the links ourselves because we need the entire tree.
-  $links = menu_tree_output(menu_tree_all_data(variable_get('menu_secondary_links_source', 'user-menu')));
-  $output = _<%= themeMachineName %>_links($links);
-  $variables['attributes']['class'][] = 'right';
-
-  return '<ul' . drupal_attributes($variables['attributes']) . '>' . $output . '</ul>';
-}
-
-/**
- * Helper function to output a Drupal menu as a Foundation Top Bar.
- *
- * @param array
- *   An array of menu links.
- *
- * @return string
- *   A rendered list of links, with no <ul> or <ol> wrapper.
- *
- * @see <%= themeMachineName %>_links__system_main_menu()
- * @see <%= themeMachineName %>_links__system_secondary_menu()
- */
-function _<%= themeMachineName %>_links($links) {
-  $output = '';
-
-  foreach (element_children($links) as $key) {
-    $output .= _<%= themeMachineName %>_render_link($links[$key]);
-  }
-
-  return $output;
-}
-
-/**
- * Helper function to recursively render sub-menus.
- *
- * @param array
- *   An array of menu links.
- *
- * @return string
- *   A rendered list of links, with no <ul> or <ol> wrapper.
- *
- * @see _<%= themeMachineName %>_links()
- */
-function _<%= themeMachineName %>_render_link($link) {
-  $output = '';
-
-  // This is a duplicate link that won't get the dropdown class and will only
-  // show up in small-screen.
-  $small_link = $link;
-
-  if (!empty($link['#below'])) {
-    $link['#attributes']['class'][] = 'has-dropdown';
-  }
-
-  // Render top level and make sure we have an actual link.
-  if (!empty($link['#href'])) {
-    $rendered_link = NULL;
-
-    // Foundation offers some of the same functionality as Special Menu Items;
-    // ie: Dividers and Labels in the top bar. So let's make sure that we
-    // render them the Foundation way.
-    if (module_exists('special_menu_items')) {
-      if ($link['#href'] === '<nolink>') {
-        $rendered_link = '<label>' . $link['#title'] . '</label>';
-      }
-      else if ($link['#href'] === '<separator>') {
-        $link['#attributes']['class'][] = 'divider';
-        $rendered_link = '';
-      }
-    }
-
-    // If this item is active and/or in the active trail, add necessary classes.
-    $active_classes = _<%= themeMachineName %>_in_active_trail($link['#href']);
-    if (isset($link['#attributes']['class'])) {
-      $link['#attributes']['class'] = array_merge($link['#attributes']['class'], $active_classes);
-    }
-    else {
-      $link['#attributes']['class'] = $active_classes;
-    }
-
-    // Test for localization options and apply them if they exist.
-    if (isset($link['#localized_options']['attributes']) && is_array($link['#localized_options']['attributes'])) {
-      $link['#attributes'] = array_merge_recursive($link['#attributes'], $link['#localized_options']['attributes']);
-    }
-
-    // If this item is in the active trail, merge the active-trail class into
-    // the #localized_options.
-    if (in_array('active-trail', $active_classes)) {
-      if(isset($link['#localized_options']['attributes']['class'])) {
-        $link['#localized_options']['attributes']['class'][] = 'active-trail';
-      }
-      else {
-        $link['#localized_options']['attributes']['class'][] = 'active-trail';
-      }
-    }
-
-    // Only render our link now that all classes have been folded into the
-    // #localized_options array.
-    if (!isset($rendered_link)) {
-      $rendered_link = theme('<%= themeMachineName %>_menu_link', array('link' => $link));
-    }
-
-    $output .= '<li' . drupal_attributes($link['#attributes']) . '>' . $rendered_link;
-
-    // Build lower menu levels
-    if (!empty($link['#below'])) {
-      $sub_menu = '';
-
-      // Add repeated link under the dropdown for small-screen.
-      $small_link['#attributes']['class'][] = 'show-for-small';
-      $sub_menu = '<li' . drupal_attributes($small_link['#attributes']) . '>' . l($link['#title'], $link['#href'], $link['#localized_options']);
-
-      // Build sub nav recursively.
-      foreach ($link['#below'] as $sub_link) {
-        if (!empty($sub_link['#href'])) {
-          $sub_menu .= _<%= themeMachineName %>_render_link($sub_link);
-        }
-      }
-
-      $output .= '<ul class="dropdown">' . $sub_menu . '</ul>';
-    }
-
-    $output .=  '</li>';
-  }
-
-  return $output;
-}
-
-/**
- * Checks whether an item is active or in the active trail.
- *
- * This is based on the code in the core toolbar module
- * /modules/toolbar/toolbar.module function toolbar_in_active_trail($path)
- *
- * @param
- *   The path of a menu item we're evaluating
- *
- * @return
- *   An array of classes if active or in the active trail.
- *   An empty array if not active or in the active trail.
- *
- * @todo
- *   Look at migrating to a menu system level function.
- */
-function _<%= themeMachineName %>_in_active_trail($link_path) {
-  $classes = array();
-  $active_paths = array();
-
-  // Don't waste cycles: if we're on the front page, we're either active or not
-  // and we don't need to look at the rest of the tree.
-  if (drupal_is_front_page()) {
-    if ($link_path == '<front>') {
-      $classes[] = 'active';
-    }
-    return $classes;
-  }
-
-  // If the current page matches the item path, it's active and we don't need to
-  // look further. Comment out the return statement to have both 'active' and
-  // 'active-trail' classes applied to the item for the current page.
-  if ($link_path == current_path()) {
-    $classes[] = 'active';
-    return $classes;
-  }
-
-  // If we're not on the front page and the current link is not the current page,
-  // The we need to check the whole active trail. Since Drupal caches the result
-  // of menu_get_active_trail(), this is not too costly.
-  $active_trail = menu_get_active_trail();
-  $front = array_shift($active_trail);
-  foreach ($active_trail as $item) {
-    if(!empty($item['link_path'])) {
-      $active_paths[$item['link_path']] = TRUE;
-    }
-  }
-
-  if (!empty($active_paths[$link_path])) {
-    $classes[] = 'active-trail';
-  }
-
-  return $classes;
-}
-
-/**
- * Theme function to render a single top bar menu link.
- */
-function theme_<%= themeMachineName %>_menu_link($variables) {
-  $link = $variables['link'];
-  return l($link['#title'], $link['#href'], $link['#localized_options']);
-}
-/*
- * Implements hook_preprocess_block()
- */
-function <%= themeMachineName %>_preprocess_block(&$variables) {
-  // Convenience variable for block headers.
-  $title_class = &$variables['title_attributes_array']['class'];
-
-  // Generic block header class.
-  $title_class[] = 'block-title';
-
-  // In the header region visually hide block titles.
-  if ($variables['block']->region == 'header') {
-    $title_class[] = 'element-invisible';
-  }
-
-  // Add a unique class for each block for styling.
-  $variables['classes_array'][] = $variables['block_html_id'];
-
-  // Add classes based on region.
-  switch ($variables['elements']['#block']->region) {
-    // Clear blocks in this region
-    case 'sidebar_first':
-      $variables['classes_array'][] = 'clearfix';
-      break;
-    // Add a striping class & clear blocks in this region
-    case 'sidebar_second':
-      $variables['classes_array'][] = 'block-' . $variables['zebra'];
-      $variables['classes_array'][] = 'clearfix';
-      break;
-
-    case 'header':
-      $variables['classes_array'][] = 'header';
-      break;
-
-    default;
-  }
-}
-/**
- * Implements template_preprocess_field().
- */
-function <%= themeMachineName %>_preprocess_field(&$variables) {
-  $variables['title_attributes_array']['class'][] = 'field-label';
-
-  // Edit classes for taxonomy term reference fields.
-  if ($variables['field_type_css'] == 'taxonomy-term-reference') {
-    $variables['content_attributes_array']['class'][] = 'comma-separated';
-  }
-
-  // Convenience variables.
-  $name = $variables['element']['#field_name'];
-  $bundle = $variables['element']['#bundle'];
-  $mode = $variables['element']['#view_mode'];
-  $classes = &$variables['classes_array'];
-  $title_classes = &$variables['title_attributes_array']['class'];
-  $content_classes = &$variables['content_attributes_array']['class'];
-  $item_classes = array();
-
-  // Global field classes.
-  $classes[] = 'field-wrapper';
-  $content_classes[] = 'field-items';
-  $item_classes[] = 'field-item';
-
-  // Uncomment the lines below to see variables you can use to target a field.
-  // print '<strong>Name:</strong> ' . $name . '<br/>';
-  // print '<strong>Bundle:</strong> ' . $bundle  . '<br/>';
-  // print '<strong>Mode:</strong> ' . $mode .'<br/>';
-
-  // Add specific classes to targeted fields.
-  if(isset($field)) {
-    switch ($mode) {
-      // All teasers.
-      case 'teaser':
-        switch ($field) {
-          // Teaser read more links.
-          case 'node_link':
-            $item_classes[] = 'more-link';
-            break;
-          // Teaser descriptions.
-          case 'body':
-          case 'field_description':
-            $item_classes[] = 'description';
-            break;
-        }
-        break;
-    }
-  }
-
-// Check if exists
-//  switch ($field) {
-//    case 'field_authors':
-//      $title_classes[] = 'inline';
-//      $content_classes[] = 'authors';
-//      $item_classes[] = 'author';
-//      break;
-//  }
-
-  // Apply odd or even classes along with our custom classes to each item.
-  foreach ($variables['items'] as $delta => $item) {
-    $item_classes[] = $delta % 2 ? 'odd' : 'even';
-    $variables['item_attributes_array'][$delta]['class'] = $item_classes;
-  }
-
-  // Add class to a specific fields across content types.
-  switch ($variables['element']['#field_name']) {
-    case 'body':
-      $variables['classes_array'][] = 'body';
-      break;
-
-    case 'field_summary':
-      $variables['classes_array'][] = 'text-teaser';
-      break;
-
-    case 'field_link':
-    case 'field_date':
-      // Replace classes entirely, instead of adding extra.
-      $variables['classes_array'] = array('text-content');
-      break;
-
-    case 'field_image':
-      // Replace classes entirely, instead of adding extra.
-      $variables['classes_array'] = array('image');
-      break;
-
-    default:
-      break;
-  }
-  // Add classes to body based on content type and view mode.
-  if ($variables['element']['#field_name'] == 'body') {
-
-    // Add classes to Foobar content type.
-    if ($variables['element']['#bundle'] == 'foobar') {
-      $variables['classes_array'][] = 'text-secondary';
-    }
-
-    // Add classes to other content types with view mode 'teaser';
-    elseif ($variables['element']['#view_mode'] == 'teaser') {
-      $variables['classes_array'][] = 'text-secondary';
-    }
-
-    // The rest is text-content.
-    else {
-      $variables['classes_array'][] = 'field';
-    }
-  }
-}
-/**
- * Implements template_preprocess_html().
- *
- * Adds additional classes.
- */
-function <%= themeMachineName %>_preprocess_html(&$variables) {
-  global $language;
-
-  // Clean up the lang attributes
-  $variables['html_attributes'] = 'lang="' . $language->language . '" dir="' . $language->dir . '"';
-
-  // Add language body class.
-  if (function_exists('locale')) {
-    $variables['classes_array'][] = 'lang-' . $variables['language']->language;
-  }
-
-  //  @TODO Custom fonts from Google web-fonts
-  //  $font = str_replace(' ', '+', theme_get_setting('<%= themeMachineName %>_font'));
-  //  if (theme_get_setting('<%= themeMachineName %>_font')) {
-  //    drupal_add_css('http://fonts.googleapis.com/css?family=' . $font , array('type' => 'external', 'group' => CSS_THEME));
-  //  }
-
-  // Classes for body element. Allows advanced theming based on context
-  if (!$variables['is_front']) {
-
-    // Add unique class for each page.
-    $path = drupal_get_path_alias($_GET['q']);
-
-    // Add unique class for each website section.
-    list($section, ) = explode('/', $path, 2);
-    $arg = explode('/', $_GET['q']);
-    if ($arg[0] == 'node' && isset($arg[1])) {
-      if ($arg[1] == 'add') {
-        $section = 'node-add';
-      }
-      elseif (isset($arg[2]) && is_numeric($arg[1]) && ($arg[2] == 'edit' || $arg[2] == 'delete')) {
-        $section = 'node-' . $arg[2];
-      }
-    }
-    $variables['classes_array'][] = drupal_html_class('section-' . $section);
-  }
-
-  // Store the menu item since it has some useful information.
-  $variables['menu_item'] = menu_get_item();
-  if ($variables['menu_item']) {
-    switch ($variables['menu_item']['page_callback']) {
-      case 'views_page':
-        $variables['classes_array'][] = 'views-page';
-        break;
-      case 'page_manager_page_execute':
-      case 'page_manager_node_view':
-      case 'page_manager_contact_site':
-        $variables['classes_array'][] = 'panels-page';
-        break;
-    }
-  }
-}
-
-/**
- * Implements template_preprocess_node
- *
- * Add template suggestions and classes.
- */
-function <%= themeMachineName %>_preprocess_node(&$variables) {
-  // Add node--node_type--view_mode.tpl.php suggestions.
-  $variables['theme_hook_suggestions'][] = 'node__' . $variables['type'] . '__' . $variables['view_mode'];
-
-  // Add node--view_mode.tpl.php suggestions.
-  $variables['theme_hook_suggestions'][] = 'node__' . $variables['view_mode'];
-
-  // Add a class for the view mode.
-  if (!$variables['teaser']) {
-    $variables['classes_array'][] = 'view-mode-' . $variables['view_mode'];
-  }
-
-  $variables['title_attributes_array']['class'][] = 'node-title';
-}
-
-/**
- * Implements template_preprocess_page
- *
- * Add convenience variables and template suggestions.
- */
-function <%= themeMachineName %>_preprocess_page(&$variables) {
-  // Add page--node_type.tpl.php suggestions
-  if (!empty($variables['node'])) {
-    $variables['theme_hook_suggestions'][] = 'page__' . $variables['node']->type;
-  }
-
-  $variables['logo_img'] = '';
-  if (!empty($variables['logo'])) {
-    $variables['logo_img'] = theme('image', array(
-      'path'  => $variables['logo'],
-      'alt'   => strip_tags($variables['site_name']) . ' ' . t('logo'),
-      'title' => strip_tags($variables['site_name']) . ' ' . t('Home'),
-      'attributes' => array(
-        'class' => array('logo'),
-      ),
-    ));
-  }
-
-  $variables['linked_logo']  = '';
-  if (!empty($variables['logo_img'])) {
-    $variables['linked_logo'] = l($variables['logo_img'], '<front>', array(
-      'attributes' => array(
-        'rel'   => 'home',
-        'title' => strip_tags($variables['site_name']) . ' ' . t('Home'),
-      ),
-      'html' => TRUE,
-    ));
-  }
-
-  $variables['linked_site_name'] = '';
-  if (!empty($variables['site_name'])) {
-    $variables['linked_site_name'] = l($variables['site_name'], '<front>', array(
-      'attributes' => array(
-        'rel'   => 'home',
-        'title' => strip_tags($variables['site_name']) . ' ' . t('Home'),
-      ),
-    ));
-  }
-
-  // Top bar.
-  if ($variables['top_bar'] = theme_get_setting('<%= themeMachineName %>_top_bar_enable')) {
-    $top_bar_classes = array();
-
-    if (theme_get_setting('<%= themeMachineName %>_top_bar_grid')) {
-      $top_bar_classes[] = 'contain-to-grid';
-    }
-
-    if (theme_get_setting('<%= themeMachineName %>_top_bar_sticky')) {
-      $top_bar_classes[] = 'sticky';
-    }
-
-    if ($variables['top_bar'] == 2) {
-      $top_bar_classes[] = 'show-for-small';
-    }
-
-    $variables['top_bar_classes'] = implode(' ', $top_bar_classes);
-    $variables['top_bar_menu_text'] = check_plain(theme_get_setting('<%= themeMachineName %>_top_bar_menu_text'));
-
-    $top_bar_options = array();
-
-    if (!theme_get_setting('<%= themeMachineName %>_top_bar_custom_back_text')) {
-      $top_bar_options[] = 'custom_back_text:false';
-    }
-
-    if ($back_text = check_plain(theme_get_setting('<%= themeMachineName %>_top_bar_back_text'))) {
-      if ($back_text !== 'Back') {
-        $top_bar_options[] = "back_text:'{$back_text}'";
-      }
-    }
-
-    if (!theme_get_setting('<%= themeMachineName %>_top_bar_is_hover')) {
-      $top_bar_options[] = 'is_hover:false';
-    }
-
-    if (!theme_get_setting('<%= themeMachineName %>_top_bar_scrolltop')) {
-      $top_bar_options[] = 'scrolltop:false';
-    }
-
-    $variables['top_bar_options'] = ' data-options="' . implode('; ', $top_bar_options) . '"';
-  }
-
-  // Alternative header.
-  // This is what will show up if the top bar is disabled or enabled only for
-  // mobile.
-  if ($variables['alt_header'] = ($variables['top_bar'] != 1)) {
-    // Hide alt header on mobile if using top bar in mobile.
-    $variables['alt_header_classes'] = $variables['top_bar'] == 2 ? ' hide-for-small' : '';
-  }
-
-  // Menus for alternative header.
-  $variables['alt_main_menu'] = '';
-
-  if (!empty($variables['main_menu'])) {
-    $variables['alt_main_menu'] = theme('links__system_main_menu', array(
-      'links' => $variables['main_menu'],
-      'attributes' => array(
-        'id' => 'main-menu-links',
-        'class' => array('links', 'inline-list', 'clearfix'),
-      ),
-      'heading' => array(
-        'text' => t('Main menu'),
-        'level' => 'h2',
-        'class' => array('element-invisible'),
-      ),
-    ));
-  }
-
-  $variables['alt_secondary_menu'] = '';
-
-  if (!empty($variables['secondary_menu'])) {
-    $variables['alt_secondary_menu'] = theme('links__system_secondary_menu', array(
-      'links' => $variables['secondary_menu'],
-      'attributes' => array(
-        'id' => 'secondary-menu-links',
-        'class' => array('links', 'clearfix'),
-      ),
-      'heading' => array(
-        'text' => t('Secondary menu'),
-        'level' => 'h2',
-        'class' => array('element-invisible'),
-      ),
-    ));
-  }
-
-  // Top bar menus.
-  $variables['top_bar_main_menu'] = '';
-  if (!empty($variables['main_menu'])) {
-    $variables['top_bar_main_menu'] = theme('links__topbar_main_menu', array(
-      'links' => $variables['main_menu'],
-      'attributes' => array(
-        'id' => 'main-menu',
-        'class' => array('main-nav'),
-      ),
-      'heading' => array(
-        'text' => t('Main menu'),
-        'level' => 'h2',
-        'class' => array('element-invisible'),
-      ),
-    ));
-  }
-
-  $variables['top_bar_secondary_menu'] = '';
-  if (!empty($variables['secondary_menu'])) {
-    $variables['top_bar_secondary_menu'] = theme('links__topbar_secondary_menu', array(
-      'links' => $variables['secondary_menu'],
-      'attributes' => array(
-        'id'    => 'secondary-menu',
-        'class' => array('secondary', 'link-list'),
-      ),
-      'heading' => array(
-        'text' => t('Secondary menu'),
-        'level' => 'h2',
-        'class' => array('element-invisible'),
-      ),
-    ));
-  }
-
-  // Messages in modal.
-  $variables['<%= themeMachineName %>_messages_modal'] = theme_get_setting('<%= themeMachineName %>_messages_modal');
-
-  // Convenience variables
-  if (!empty($variables['page']['sidebar_first'])){
-    $left = $variables['page']['sidebar_first'];
-  }
-
-  if (!empty($variables['page']['sidebar_second'])) {
-    $right = $variables['page']['sidebar_second'];
-  }
-
-  // Dynamic sidebars
-  if (!empty($left) && !empty($right)) {
-    $variables['main_grid'] = 'large-6 push-3';
-    $variables['sidebar_first_grid'] = 'large-3 pull-6';
-    $variables['sidebar_sec_grid'] = 'large-3';
-  } elseif (empty($left) && !empty($right)) {
-    $variables['main_grid'] = 'large-9';
-    $variables['sidebar_first_grid'] = '';
-    $variables['sidebar_sec_grid'] = 'large-3';
-  } elseif (!empty($left) && empty($right)) {
-    $variables['main_grid'] = 'large-9 push-3';
-    $variables['sidebar_first_grid'] = 'large-3 pull-9';
-    $variables['sidebar_sec_grid'] = '';
-  } else {
-    $variables['main_grid'] = 'large-12';
-    $variables['sidebar_first_grid'] = '';
-    $variables['sidebar_sec_grid'] = '';
-  }
-
-  // Ensure modal reveal behavior if modal messages are enabled.
-  if(theme_get_setting('<%= themeMachineName %>_messages_modal')) {
-    drupal_add_js(drupal_get_path('theme', '<%= themeMachineName %>') . '/build/js/behavior/reveal.js');
-  }
-}
-
-/**
- * Implements hook_css_alter()
+ * Implements hook_css_alter().
  */
 function <%= themeMachineName %>_css_alter(&$css) {
-  // Remove defaults.css file.
-  unset($css[drupal_get_path('module', 'system') . '/system.menus.css']);
+  // Remove unnecessary styles provided by drupal core and contrib modules.
+  unset($css['modules/system/system.menus.css']);
+  unset($css['modules/system/system.messages.css']);
+  unset($css['modules/system/system.theme.css']);
+}
 
-  // Remove Drupal core CSS.
-  if (theme_get_setting('<%= themeMachineName %>_disable_core_css')) {
-    foreach($css as $path => $values) {
-      if(strpos($path, 'modules/') === 0) {
-        unset($css[$path]);
-      }
+/*
+ * Implements hook_preprocess_html().
+ */
+ function <%= themeMachineName %>_preprocess_html(&$variables) {
+
+ }
+
+/*
+ * Implements hook_preprocess_page().
+ */
+ function <%= themeMachineName %>_preprocess_page(&$variables) {
+
+ }
+
+/**
+ * Implements hook_preprocess_node().
+ */
+function <%= themeMachineName %>_preprocess_node(&$variables) {
+  // Create generic view mode theme hook suggestions and make it this 1st item in the array.
+  array_unshift($variables['theme_hook_suggestions'], 'node__' . $variables['view_mode']);
+}
+
+/**
+ * Discover and invoke any preprocess hooks for entities based on their type
+ * and bundle.
+ */
+function <%= themeMachineName %>_preprocess_entity(&$variables) {
+  $entity_type = $variables['entity_type'];
+  $function = '<%= themeMachineName %>_preprocess_' . $entity_type;
+
+  if (function_exists($function)) {
+    $function($variables);
+  }
+
+  if (isset($variables[$entity_type])) {
+    $entity = $variables[$entity_type];
+    list(, , $bundle) = entity_extract_ids($entity_type, $entity);
+
+    $function = $function . '_' . $bundle;
+    if (function_exists($function)) {
+      $function($variables);
     }
   }
 }
 
 /**
- * Replace Drupal pagers with Foundation pagers.
+ * Implements theme_breadcrumb().
+ */
+function <%= themeMachineName %>_breadcrumb($variables) {
+  $breadcrumb = !empty($variables['breadcrumb']) ? $variables['breadcrumb'] : NULL;
+
+  if (!empty($breadcrumb)) {
+    // Add current page title as last item in breadcrumb.
+    $title = drupal_get_title();
+    if (!empty($title)) {
+      $breadcrumb[] = $title;
+    }
+
+    // Provide a navigational heading to give context for breadcrumb links to
+    // screen-reader users. Make the heading invisible with .element-invisible.
+    $output = '<nav aria-label="' . t('You are here') . ':" role="navigation">';
+    $output .= '<ul class="breadcrumbs"><li>' . implode('</li><li>', $breadcrumb) . '</li></ul>';
+    $output .= '</nav>';
+    return $output;
+  }
+}
+
+/*
+ * Implements theme_pager_previous().
+ */
+function <%= themeMachineName %>_pager_previous($variables) {
+  $text = $variables['text'];
+  $element = $variables['element'];
+  $interval = $variables['interval'];
+  $parameters = $variables['parameters'];
+  global $pager_page_array;
+  $output = '';
+
+  // If we are on the first page
+  if ($pager_page_array[$element] == 0) {
+    $output = t($text);
+  }
+
+  // If we are anywhere but the first page
+  if ($pager_page_array[$element] > 0) {
+    $page_new = pager_load_array($pager_page_array[$element] - $interval, $element, $pager_page_array);
+
+    // If the previous page is the first page, mark the link as such.
+    if ($page_new[$element] == 0) {
+      $output = theme('pager_first', array('text' => $text, 'element' => $element, 'parameters' => $parameters));
+    }
+    // The previous page is not the first page.
+    else {
+      $output = theme('pager_link', array('text' => $text, 'page_new' => $page_new, 'element' => $element, 'parameters' => $parameters));
+    }
+  }
+
+  return $output;
+}
+
+/**
+ * Implements theme_pager_next().
+ */
+function <%= themeMachineName %>_pager_next($variables) {
+  $text = $variables['text'];
+  $element = $variables['element'];
+  $interval = $variables['interval'];
+  $parameters = $variables['parameters'];
+  global $pager_page_array, $pager_total;
+  $output = '';
+
+  // If we are anywhere but the last page
+  if ($pager_page_array[$element] < ($pager_total[$element] - 1)) {
+    $page_new = pager_load_array($pager_page_array[$element] + $interval, $element, $pager_page_array);
+    // If the next page is the last page, mark the link as such.
+    if ($page_new[$element] == ($pager_total[$element] - 1)) {
+      $output = theme('pager_last', array('text' => $text, 'element' => $element, 'parameters' => $parameters));
+    }
+    // The next page is not the last page.
+    else {
+      $output = theme('pager_link', array('text' => $text, 'page_new' => $page_new, 'element' => $element, 'parameters' => $parameters));
+    }
+  }
+  // If we are on the last page
+  else if ($pager_page_array[$element] == ($pager_total[$element] - 1)) {
+    $output = t($text);
+  }
+
+  return $output;
+}
+
+/**
+ * Implements theme_pager().
  */
 function <%= themeMachineName %>_pager($variables) {
   $tags = $variables['tags'];
@@ -795,15 +160,10 @@ function <%= themeMachineName %>_pager($variables) {
   // Calculate various markers within this pager piece:
   // Middle is used to "center" pages around the current page.
   $pager_middle = ceil($quantity / 2);
-  // Current is the page we are currently paged to.
   $pager_current = $pager_page_array[$element] + 1;
-  // First is the first page listed by this pager piece (re-quantify).
   $pager_first = $pager_current - $pager_middle + 1;
-  // Last is the last page listed by this pager piece (re-quantify)
   $pager_last = $pager_current + $quantity - $pager_middle;
-  // Max is the maximum page number.
   $pager_max = $pager_total[$element];
-  // End of marker calculations.
 
   // Prepare for generation loop.
   $i = $pager_first;
@@ -819,21 +179,19 @@ function <%= themeMachineName %>_pager($variables) {
   }
   // End of generation loop preparation.
 
-  $li_first = theme('pager_first', array('text' => (isset($tags[0]) ? $tags[0] : t('« first')), 'element' => $element, 'parameters' => $parameters));
-  $li_previous = theme('pager_previous', array('text' => (isset($tags[1]) ? $tags[1] : t('‹ previous')), 'element' => $element, 'interval' => 1, 'parameters' => $parameters));
-  $li_next = theme('pager_next', array('text' => (isset($tags[3]) ? $tags[3] : t('next ›')), 'element' => $element, 'interval' => 1, 'parameters' => $parameters));
-  $li_last = theme('pager_last', array('text' => (isset($tags[4]) ? $tags[4] : t('last »')), 'element' => $element, 'parameters' => $parameters));
+  $li_previous = theme('pager_previous', array('text' => (isset($tags[1]) ? $tags[1] : t('Previous')), 'element' => $element, 'interval' => 1, 'parameters' => $parameters));
+  $li_next = theme('pager_next', array('text' => (isset($tags[3]) ? $tags[3] : t('Next')), 'element' => $element, 'interval' => 1, 'parameters' => $parameters));
 
   if ($pager_total[$element] > 1) {
-    if ($li_first) {
+    if ($pager_current == 1 && $li_previous) {
       $items[] = array(
-        'class' => array('arrow'),
-        'data' => $li_first,
+        'class' => array('pagination-previous', 'disabled'),
+        'data' => $li_previous,
       );
     }
-    if ($li_previous) {
+    elseif ($li_previous) {
       $items[] = array(
-        'class' => array('arrow'),
+        'class' => array('pagination-previous'),
         'data' => $li_previous,
       );
     }
@@ -842,562 +200,87 @@ function <%= themeMachineName %>_pager($variables) {
     if ($i != $pager_max) {
       if ($i > 1) {
         $items[] = array(
-          'class' => array('unavailable'),
-          'data' => '<a href="">&hellip;</a>',
+          'class' => array('ellipsis'),
+          'data' => '',
         );
       }
       // Now generate the actual pager piece.
       for (; $i <= $pager_last && $i <= $pager_max; $i++) {
         if ($i < $pager_current) {
           $items[] = array(
+            'class' => array('pager-item'),
             'data' => theme('pager_previous', array('text' => $i, 'element' => $element, 'interval' => ($pager_current - $i), 'parameters' => $parameters)),
           );
         }
         if ($i == $pager_current) {
           $items[] = array(
             'class' => array('current'),
-            'data' => '<a href="">' . $i . '</a>',
+            'data' => $i,
           );
         }
         if ($i > $pager_current) {
           $items[] = array(
+            'class' => array('pager-item'),
             'data' => theme('pager_next', array('text' => $i, 'element' => $element, 'interval' => ($i - $pager_current), 'parameters' => $parameters)),
           );
         }
       }
       if ($i < $pager_max) {
         $items[] = array(
-          'class' => array('unavailable'),
-          'data' => '<a href="">&hellip;</a>',
+          'class' => array('pager-ellipsis'),
+          'data' => '…',
         );
       }
     }
     // End generation.
-    if ($li_next) {
+    if (($pager_current == $pager_total[$element]) && $li_previous) {
       $items[] = array(
-        'class' => array('arrow'),
+        'class' => array('pagination-next', 'disabled'),
         'data' => $li_next,
       );
     }
-    if ($li_last) {
+    else if ($li_next) {
       $items[] = array(
-        'class' => array('arrow'),
-        'data' => $li_last,
+        'class' => array('pagination-next'),
+        'data' => $li_next,
       );
     }
+    return '<h2 class="element-invisible">' . t('Pages') . '</h2>' . theme('item_list', array(
+      'items' => $items,
+      'attributes' => array('class' => array('pagination', 'text-center'), 'role' => array('navigation'), 'aria-label' => array('Pagination')),
+    ));
+  }
+}
 
-    $pager_links = array(
-      '#theme' => 'item_list',
-      '#items' => $items,
-      '#attributes' => array('class' => array('pagination', 'pager')),
-    );
+/**
+ * Implements theme_status_messages().
+ */
+function <%= themeMachineName %>_status_messages($variables) {
+  $display = $variables['display'];
+  $output = '';
 
-    if (theme_get_setting('<%= themeMachineName %>_pager_center')) {
-      $pager_links['#prefix'] = '<div class="pagination-centered">';
-      $pager_links['#suffix'] = '</div>';
+  $status_heading = array(
+    'status' => t('Status message'),
+    'error' => t('Error message'),
+    'warning' => t('Warning message'),
+  );
+  foreach (drupal_get_messages($display) as $type => $messages) {
+    $output .= '<div class="messages messages--' . $type . '">';
+    if (!empty($status_heading[$type])) {
+      $output .= '<h2 class="element-invisible">' . $status_heading[$type] . "</h2>";
     }
-
-    $pager_links = drupal_render($pager_links);
-
-    return '<h2 class="element-invisible">' . t('Pages') . '</h2>' . $pager_links;
-  }
-}
-
-/**
- * Implements hook_theme().
- */
-function <%= themeMachineName %>_theme() {
-  $return = array();
-
-  $return['<%= themeMachineName %>_reveal'] = array(
-    'variables' => array(
-      // The text to display in the link.
-      'text' => '',
-      // Whether the text uses HTML.
-      'html' => FALSE,
-      // Whether the reveal uses AJAX content.
-      // This can either be set to true, to use the link's href property or be
-      // a URL to load the content from. Note that setting this parameter will
-      // override the contents of the "reveal" variable.
-      'ajax' => FALSE,
-      // The path for the link's href property. This is only really useful if
-      // you want to set 'ajax' to TRUE (see above).
-      'path' => FALSE,
-      // The content for the reveal modal. Can be either a string or a render
-      // array.
-      'reveal' => '',
-      // Extra classes to add to the link.
-      'link_classes_array' => array('zurb-foundation-reveal'),
-      // Extra classes to add to the reveal modal.
-      'reveal_classes_array' => array('expand'),
-    ),
-    'function' => 'theme_<%= themeMachineName %>_reveal',
-  );
-
-  $return['<%= themeMachineName %>_menu_link'] = array(
-    'variables' => array('link' => NULL),
-    'function' => 'theme_<%= themeMachineName %>_menu_link',
-  );
-  return $return;
-}
-
-/**
- * Helper function to store and return markup for reveal modals on the page.
- * This is necessary because we need to add all of the reveals to the bottom of
- * the page to avoid unexpected behavior. For more information please refer to
- * the official Zurb Foundation documentation.
- *
- * @param array
- *   A render array for a reveal modal to store.
- * @return array
- *   An array of all reveal render arrays.
- *
- * @see theme_<%= themeMachineName %>_reveal()
- */
-function _<%= themeMachineName %>_reveal($reveal = NULL) {
-  $reveals = &drupal_static(__FUNCTION__);
-
-  if (!isset($reveals)) {
-    $reveals = array();
-  }
-
-  if (isset($reveal)) {
-    $reveals[] = $reveal;
-  }
-
-  return $reveals;
-}
-
-
-/**
- * Theme function to create Zurb Foundation reveal modals.
- *
- * @see <%= themeMachineName %>_theme()
- * @see <%= themeMachineName %>_preprocess_region()
- * @see _<%= themeMachineName %>_reveal()
- */
-function theme_<%= themeMachineName %>_reveal($variables) {
-  // Generate unique IDs.
-  static $counter = 0;
-
-  // Prepare reveal markup.
-  $reveal_id = 'zf-reveal-' . ++$counter;
-  $variables['reveal_classes_array'][] = 'reveal-modal';
-  $reveal_classes = implode(' ', $variables['reveal_classes_array']);
-
-  // Render reveal contents if applicable.
-  if (is_array($variables['reveal'])) {
-    $variables['reveal'] = drupal_render($variables['reveal']);
-  }
-
-  $reveal = array(
-    '#markup' => $variables['reveal'],
-    '#prefix' => '<div id="' . $reveal_id . '" class="' . $reveal_classes . '">',
-    '#suffix' => '<a class="close-reveal-modal">&#215;</a></div>',
-  );
-
-  // Add reveal markup to static storage.
-  _<%= themeMachineName %>_reveal($reveal);
-
-  $build = array(
-    '#theme' => 'link',
-    '#text' => $variables['text'],
-    '#path' => $variables['path'] ? $variables['path'] : 'javascript:',
-    '#options' => array(
-      'attributes' => array(
-        'id' => 'zf-reveal-link-' . $counter,
-        'class' => $variables['link_classes_array'],
-        'data-reveal-id' => $reveal_id,
-      ),
-      'html' => $variables['html'],
-      'external' => TRUE,
-    ),
-  );
-
-  // Check for AJAX.
-  if ($variables['ajax']) {
-    if ($variables['ajax'] === TRUE) {
-      $variables['ajax'] = 'true';
-    }
-    $build['#options']['attributes']['data-reveal-ajax'] = $variables['ajax'];
-  }
-
-  return drupal_render($build);
-}
-
-/**
- * Add the reveal modal markup (if any) to the page_bottom region.
- */
-function _<%= themeMachineName %>_add_reveals() {
-  $markup = '';
-
-  // Retrieve reveal markup from static storage.
-  foreach (_<%= themeMachineName %>_reveal() as $reveal) {
-    $markup .= "\n" . drupal_render($reveal);
-  }
-
-  return $markup;
-}
-
-/**
- * Implements hook_theme_registry_alter().
- */
-function <%= themeMachineName %>_theme_registry_alter(&$theme_registry) {
-  // Add our own preprocess function to entities so we can add default classes
-  // to our custom Display Suite layouts.
-  $entity_info = entity_get_info();
-  foreach ($entity_info as $entity => $info) {
-    if (isset($entity_info[$entity]['fieldable']) && $entity_info[$entity]['fieldable']) {
-
-      // User uses user_profile for theming.
-      if ($entity == 'user') $entity = 'user_profile';
-
-      // Only add preprocess functions if entity exposes theme function.
-      if (isset($theme_registry[$entity])) {
-        $theme_registry[$entity]['preprocess functions'][] = '<%= themeMachineName %>_entity_variables';
+    if (count($messages) > 1) {
+      $output .= '<ul>';
+      foreach ($messages as $message) {
+        $output .= '  <li>' . $message . '</li>';
       }
+      $output .= '</ul>';
     }
-  }
-
-  // Support for File Entity.
-  if (isset($theme_registry['file_entity'])) {
-    $theme_registry['file_entity']['preprocess functions'][] = '<%= themeMachineName %>_entity_variables';
-  }
-
-  // Support for Entity API.
-  if (isset($theme_registry['entity'])) {
-    $theme_registry['entity']['preprocess functions'][] = '<%= themeMachineName %>_entity_variables';
-  }
-}
-
-/**
- * Add default classes to Display Suite regions if none are set.
- *
- * This approach was taken from Display Suite.
- *
- * @see <%= themeMachineName %>_theme_registry_alter()
- */
-function <%= themeMachineName %>_entity_variables(&$vars) {
-  // Only alter entities that have been rendered by Display Suite.
-  if (isset($vars['rendered_by_ds'])) {
-    // If Display Suite rendered this, it's safe to assume we have the arguments
-    // necessary to grab the layout.
-    $layout = ds_get_layout($vars['elements']['#entity_type'], $vars['elements']['#bundle'], $vars['elements']['#view_mode']);
-
-    // Each layout has different regions, only set default classes if none of
-    // them have custom classes.
-    switch ($layout['layout']) {
-      case 'zf_1col':
-        if (empty($vars['ds_content_classes'])) {
-          $vars['ds_content_classes'] = ' large-12';
-          $vars['classes_array'][] = 'row';
-        }
-        break;
-      case 'zf_2col':
-        if (empty($vars['left_classes']) && empty($vars['right_classes'])) {
-          $vars['left_classes'] = ' large-6';
-          $vars['right_classes'] = ' large-6';
-          $vars['classes_array'][] = 'row';
-        }
-        break;
-      case 'zf_2col_stacked':
-        if (
-          empty($vars['header_classes']) && empty($vars['left_classes'])
-          && empty($vars['right_classes']) && empty($vars['footer_classes'])
-        ) {
-          $vars['header_classes'] = ' large-12';
-          $vars['left_classes'] = ' large-6';
-          $vars['right_classes'] = ' large-6';
-          $vars['footer_classes'] = ' large-12';
-          $vars['classes_array'][] = 'row';
-        }
-        break;
-      case 'zf_2col_bricks':
-        if (empty($vars['top_classes']) && empty($vars['above_left_classes'])
-          && empty($vars['above_right_classes']) && empty($vars['middle_classes'])
-          && empty($vars['below_left_classes']) && empty($vars['below_right_classes'])
-          && empty($vars['bottom_classes'])
-        ) {
-          $vars['top_classes'] = ' large-12';
-          $vars['above_left_classes'] = ' large-6';
-          $vars['above_right_classes'] = ' large-6';
-          $vars['middle_classes'] = ' large-12';
-          $vars['below_left_classes'] = ' large-6';
-          $vars['below_right_classes'] = ' large-6';
-          $vars['bottom_classes'] = ' large-12';
-          $vars['classes_array'][] = 'row';
-        }
-        break;
-      case 'zf_3col':
-        if (empty($vars['left_classes']) && empty($vars['middle_classes'])
-          && empty($vars['right_classes'])
-        ) {
-          $vars['left_classes'] = ' large-4';
-          $vars['middle_classes'] = ' large-4';
-          $vars['right_classes'] = ' large-4';
-          $vars['classes_array'][] = 'row';
-        }
-        break;
-      case 'zf_3col_stacked':
-        if (
-          empty($vars['header_classes']) && empty($vars['left_classes'])
-          && empty($vars['middle_classes']) && empty($vars['right_classes'])
-          && empty($vars['footer_classes'])
-        ) {
-          $vars['header_classes'] = ' large-12';
-          $vars['left_classes'] = ' large-4';
-          $vars['middle_classes'] = ' large-4';
-          $vars['right_classes'] = ' large-4';
-          $vars['footer_classes'] = ' large-12';
-          $vars['classes_array'][] = 'row';
-        }
-        break;
-      case 'zf_3col_bricks':
-        if (empty($vars['top_classes']) && empty($vars['above_left_classes'])
-          && empty($vars['above_middle_classes']) && empty($vars['above_right_classes'])
-          && empty($vars['middle_classes']) && empty($vars['below_left_classes'])
-          && empty($vars['below_middle_classes']) && empty($vars['below_right_classes'])
-          && empty($vars['bottom_classes'])
-        ) {
-          $vars['top_classes'] = ' large-12';
-          $vars['above_left_classes'] = ' large-4';
-          $vars['above_middle_classes'] = ' large-4';
-          $vars['above_right_classes'] = ' large-4';
-          $vars['middle_classes'] = ' large-12';
-          $vars['below_left_classes'] = ' large-4';
-          $vars['below_middle_classes'] = ' large-4';
-          $vars['below_right_classes'] = ' large-4';
-          $vars['bottom_classes'] = ' large-12';
-          $vars['classes_array'][] = 'row';
-        }
-        break;
-      case 'zf_3row':
-        if (empty($vars['header_classes']) && empty($vars['ds_content_classes'])
-          && empty($vars['footer_classes'])
-        ) {
-          $vars['header_classes'] = ' large-12';
-          $vars['ds_content_classes'] = ' large-12';
-          $vars['footer_classes'] = ' large-12';
-          $vars['classes_array'][] = 'row';
-        }
-        break;
-      case 'zf_4col':
-        if (empty($vars['first_classes']) && empty($vars['second_classes'])
-          && empty($vars['third_classes']) && empty($vars['fourth_classes'])
-        ) {
-          $vars['first_classes'] = ' large-3';
-          $vars['second_classes'] = ' large-3';
-          $vars['third_classes'] = ' large-3';
-          $vars['fourth_classes'] = ' large-3';
-          $vars['classes_array'][] = 'row';
-        }
-        break;
-      case 'zf_4col_stacked':
-        if (
-          empty($vars['header_classes']) && empty($vars['first_classes'])
-          && empty($vars['second_classes']) && empty($vars['third_classes'])
-          && empty($vars['fourth_classes']) && empty($vars['footer_classes'])
-        ) {
-          $vars['header_classes'] = ' large-12';
-          $vars['first_classes'] = ' large-3';
-          $vars['second_classes'] = ' large-3';
-          $vars['third_classes'] = ' large-3';
-          $vars['fourth_classes'] = ' large-3';
-          $vars['footer_classes'] = ' large-12';
-          $vars['classes_array'][] = 'row';
-        }
-        break;
-      case 'zf_4col_bricks':
-        if (empty($vars['top_classes']) && empty($vars['above_first_classes'])
-          && empty($vars['above_second_classes']) && empty($vars['above_third_classes'])
-          && empty($vars['above_fourth_classes']) && empty($vars['middle_classes'])
-          && empty($vars['below_first_classes']) && empty($vars['below_second_classes'])
-          && empty($vars['below_third_classes']) && empty($vars['below_fourth_classes'])
-          && empty($vars['bottom_classes'])
-        ) {
-          $vars['top_classes'] = ' large-12';
-          $vars['above_first_classes'] = ' large-3';
-          $vars['above_second_classes'] = ' large-3';
-          $vars['above_third_classes'] = ' large-3';
-          $vars['above_fourth_classes'] = ' large-3';
-          $vars['middle_classes'] = ' large-12';
-          $vars['below_first_classes'] = ' large-3';
-          $vars['below_second_classes'] = ' large-3';
-          $vars['below_third_classes'] = ' large-3';
-          $vars['below_fourth_classes'] = ' large-3';
-          $vars['bottom_classes'] = ' large-12';
-          $vars['classes_array'][] = 'row';
-        }
-        break;
+    else {
+      $output .= $messages[0];
     }
+    $output .= '</div>';
   }
+
+  return $output;
 }
-
-/**
- * Implements hook_process_html_tag()
- *
- * Prunes HTML tags: http://sonspring.com/journal/html5-in-drupal-7#_pruning
- */
-function <%= themeMachineName %>_process_html_tag(&$vars) {
-  if (theme_get_setting('<%= themeMachineName %>_html_tags')) {
-    $el = &$vars['element'];
-
-    // Remove type="..." and CDATA prefix/suffix.
-    unset($el['#attributes']['type'], $el['#value_prefix'], $el['#value_suffix']);
-
-    // Remove media="all" but leave others unaffected.
-    if (isset($el['#attributes']['media']) && $el['#attributes']['media'] === 'all') {
-      unset($el['#attributes']['media']);
-    }
-  }
-}
-
-/**
- * Helper function to output a single link as button or multiple links as dropdown/split buttons.
- *
- * @param $variables
- * @return string
- */
-function <%= themeMachineName %>_links__magic_button($variables) {
-  if (empty($variables['attributes']['class'])) {
-    $variables['attributes']['class'] = array();
-  }
-
-  if (count($variables['links']) > 1) {
-    switch ($variables['type']) {
-      case 'split':
-        return <%= themeMachineName %>_links__split_button($variables);
-        break;
-
-      case 'dropdown':
-      default:
-        return <%= themeMachineName %>_links__dropdown_button($variables);
-        break;
-    }
-  }
-
-  $links = $variables['links'];
-  $link = array_shift($links);
-
-  if (!isset($link['#localized_options']['attributes'])) {
-    $link['#localized_options']['attributes'] = array();
-  }
-  $link['#localized_options']['attributes'] = array_merge_recursive($link['#localized_options']['attributes'], $variables['attributes']);
-  $link['#localized_options']['attributes']['class'][] = 'button';
-
-  return l($link['#title'], $link['#href'], $link['#localized_options']);
-}
-
-/**
- * Implements theme_links() with foundations dropdown button markup.
- *
- * @param $variables
- *   An associative array containing:
- *   - label
- *     - Dropdown button label.
- *   - links
- *     - An array of menu links.
- *   - attributes (optional)
- *     - class: Array of additional classes like large, alert, round
- *     - data-dropdown: Custom dropdown id.
- *
- * @return string
- *
- * Formats links for Dropdown Button http://foundation.zurb.com/docs/components/dropdown-buttons.html
- */
-function <%= themeMachineName %>_links__dropdown_button($variables) {
-  if (empty($variables['attributes']['class'])) {
-    $variables['attributes']['class'] = array();
-  }
-
-  $variables['attributes']['class'][] = 'button';
-  $variables['attributes']['class'][] = 'dropdown';
-
-  if (!isset($variables['attributes']['data-dropdown'])) {
-    $variables['attributes']['data-dropdown'] = drupal_html_id('ddb');
-  }
-
-  if (!isset($variables['label'])) {
-    $variables['label'] = t('Dropdown button');
-  }
-
-  $title = '<a href="#"' . drupal_attributes($variables['attributes']) .'>' . $variables['label'] . '</a>';
-
-  $output = _<%= themeMachineName %>_links($variables['links']);
-  return $title . '<ul id="' . $variables['attributes']['data-dropdown'] . '" class="f-dropdown" data-dropdown-content>' . $output . '</ul>';
-}
-
-/**
- * Implements theme_links() with foundations split button markup.
- *
- * @param $variables
- *   An associative array containing:
- *   - links
- *     - An array of menu links.
- *   - attributes (optional)
- *     - class: Array of additional classes like large, alert, round
- *     - data-dropdown: Custom dropdown id.
- *
- * @return string
- *
- * Formats links for Split Button http://foundation.zurb.com/docs/components/split-buttons.html
- */
-function <%= themeMachineName %>_links__split_button($variables) {
-  $links = $variables['links'];
-
-  if (empty($variables['attributes']['class'])) {
-    $variables['attributes']['class'] = array();
-  }
-
-  $variables['attributes']['class'][] = 'button';
-
-  if (!isset($variables['attributes']['data-dropdown'])) {
-    $variables['attributes']['data-dropdown'] = drupal_html_id('ddb');
-  }
-  $id = $variables['attributes']['data-dropdown'];
-  unset($variables['attributes']['data-dropdown']);
-
-  if (!isset($variables['label'])) {
-    $variables['label'] = t('Split button');
-  }
-
-  $primary_link = array();
-  $primary_link['#title'] = $variables['label'] . '<span data-dropdown="' . $id . '"></span>';
-  $primary_link['#localized_options']['attributes']['class'][] = 'split';
-  $primary_link['#localized_options']['html'] = TRUE;
-  $primary_link['#localized_options']['fragment'] = $id;
-  $primary_link['#localized_options']['attributes'] = array_merge_recursive($primary_link['#localized_options']['attributes'], $variables['attributes']);
-  $primary_link = l($primary_link['#title'], '', $primary_link['#localized_options']);
-
-  $output = _<%= themeMachineName %>_links($links);
-
-  return $primary_link . '<ul id="' . $id . '" class="f-dropdown" data-dropdown-content>' . $output . '</ul>';
-}
-
-/*
- * Implements hook_preprocess_html().
- */
-// function <%= themeMachineName %>_preprocess_html(&$variables) {
-//
-// }
-
-/*
- * Implements hook_preprocess_page().
- */
-// function <%= themeMachineName %>_preprocess_page(&$variables) {
-//
-// }
-
-/*
- * Implements hook_form_alter().
- */
-// function <%= themeMachineName %>_form_alter(&$form, &$form_state, $form_id) {
-//
-// }
-
-/*
- * Implements hook_form_FORMID_alter().
- */
-// function <%= themeMachineName %>_form_FORMID_alter(&$form, &$form_state) {
-//
-// }
