@@ -19,7 +19,7 @@ regions[footer_third]         = Footer Third
 ; ========================================
 ; Stylesheets
 ; ========================================
-stylesheets[all][] = public/assets/css/app.css
+stylesheets[all][] = dist/assets/css/app.css
 
 ; ========================================
 ; Scripts

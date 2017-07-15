@@ -62,6 +62,6 @@
   <?php print $page_top; ?>
   <?php print $page; ?>
   <?php print $page_bottom; ?>
-  <script type="text/javascript" src="<?php global $base_url; print $base_url . '/' . drupal_get_path('theme', '<%= themeMachineName %>'); ?>/public/assets/js/app.js"></script>
+  <script type="text/javascript" src="<?php global $base_url; print $base_url . '/' . drupal_get_path('theme', '<%= themeMachineName %>'); ?>/dist/assets/js/app.js"></script>
 </body>
 </html>
