@@ -6,7 +6,7 @@ engine = phptemplate
 ; ========================================
 ; Regions
 ; ========================================
-regions[search]               = Search
+regions[top_bar_right]        = Top Bar Right
 regions[help]                 = Help
 regions[highlighted]          = Highlighted
 regions[content]              = Content

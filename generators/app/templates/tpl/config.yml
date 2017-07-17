@@ -28,7 +28,7 @@ PATHS:
     - "node_modules/font-awesome/fonts/**/*"
   # Paths to Sass libraries, which can then be loaded with @import
   sass:
-    - "bower_components/font-awesome/scss"
+    - "node_modules/font-awesome/scss"
     - "node_modules/foundation-sites/scss"
     - "node_modules/motion-ui/src"
   # Paths to JavaScript entry points for webpack to bundle modules

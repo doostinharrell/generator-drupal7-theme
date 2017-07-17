@@ -19,16 +19,18 @@ function <%= themeMachineName %>_css_alter(&$css) {
 /*
  * Implements hook_preprocess_html().
  */
- function <%= themeMachineName %>_preprocess_html(&$variables) {
+function <%= themeMachineName %>_preprocess_html(&$variables) {
 
- }
+}
 
 /*
  * Implements hook_preprocess_page().
  */
- function <%= themeMachineName %>_preprocess_page(&$variables) {
-
- }
+function <%= themeMachineName %>_preprocess_page(&$variables) {
+if (!empty($variables['main_menu'])) {
+  $variables['main_menu'] = theme('build_menu', array('menu_tree' => 'main-menu'));
+}
+}
 
 /**
  * Implements hook_preprocess_node().
@@ -283,4 +285,79 @@ function <%= themeMachineName %>_status_messages($variables) {
   }
 
   return $output;
+}
+
+/**
+ * Implements theme_item_list().
+ * Customized to remove div.item-list wrapper.
+ */
+function <%= themeMachineName %>_item_list($variables) {
+  $items = $variables['items'];
+  $title = $variables['title'];
+  $type = $variables['type'];
+  $attributes = $variables['attributes'];
+
+  // Only output the list container and title, if there are any list items.
+  // Check to see whether the block title exists before adding a header.
+  // Empty headers are not semantic and present accessibility challenges.
+  $output = '';
+  if (isset($title) && $title !== '') {
+    $output .= '<h3>' . $title . '</h3>';
+  }
+
+  if (!empty($items)) {
+    $output .= "<$type" . drupal_attributes($attributes) . '>';
+    $num_items = count($items);
+    $i = 0;
+    foreach ($items as $item) {
+      $attributes = array();
+      $children = array();
+      $data = '';
+      $i++;
+      if (is_array($item)) {
+        foreach ($item as $key => $value) {
+          if ($key == 'data') {
+            $data = $value;
+          }
+          elseif ($key == 'children') {
+            $children = $value;
+          }
+          else {
+            $attributes[$key] = $value;
+          }
+        }
+      }
+      else {
+        $data = $item;
+      }
+      if (count($children) > 0) {
+        // Render nested list.
+        $data .= theme_item_list(array('items' => $children, 'title' => NULL, 'type' => $type, 'attributes' => $attributes));
+      }
+      $output .= '<li' . drupal_attributes($attributes) . '>' . $data . "</li>\n";
+    }
+    $output .= "</$type>";
+  }
+  return $output;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function <%= themeMachineName %>_theme($existing, $type, $theme, $path) {
+  return array(
+    'build_menu' => array(
+      // $menu_tree string representing the menu tree to build
+      // $menu_classes array of classes to add to the menu
+      // $data_options string of data options as per http://foundation.zurb.com/sites/docs/menu.html
+      'variables' => array(
+        'menu_tree' => 'main-menu',
+        'menu_classes' => array('menu', 'dropdown'),
+        'data_options' => 'data-dropdown-menu',
+      ),
+    ),
+    'prepare_menu_items' => array(
+      'variables' => array(),
+    ),
+  );
 }

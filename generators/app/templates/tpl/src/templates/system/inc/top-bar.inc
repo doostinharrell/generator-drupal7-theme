@@ -1,23 +1,23 @@
-<div class="top-bar">
+<div class="title-bar" data-responsive-toggle="primary-menu" data-hide-for="medium">
+  <button class="menu-icon" type="button" data-toggle></button>
+  <div class="title-bar-title">Menu</div>
+</div>
+<div class="top-bar" id="primary-menu">
   <div class="top-bar-left">
-    <ul class="dropdown menu" data-dropdown-menu>
-      <li class="menu-text">Site Title</li>
-      <li>
-        <a href="#">One</a>
-        <ul class="menu vertical">
-          <li><a href="#">One</a></li>
-          <li><a href="#">Two</a></li>
-          <li><a href="#">Three</a></li>
-        </ul>
-      </li>
-      <li><a href="#">Two</a></li>
-      <li><a href="#">Three</a></li>
-    </ul>
+    <?php if ($main_menu): ?>
+      <ul class="menu dropdown" data-parent-link="true" data-submenu-toggle="true" data-responsive-menu="accordion medium-dropdown">
+        <?php if ($site_name): ?>
+          <li class="menu-text">
+            <strong><?php print $site_name; ?></strong>
+          </li>
+        <?php endif; ?>
+        <?php print render($main_menu); ?>
+      </ul>
+    <?php endif; ?>
   </div>
-  <div class="top-bar-right">
-    <ul class="menu">
-      <li><input type="search" placeholder="Search"></li>
-      <li><button type="button" class="button">Search</button></li>
-    </ul>
-  </div>
+  <?php if ($page['top_bar_right']): ?>
+    <div class="top-bar-right">
+      <?php print render($page['top_bar_right']); ?>
+    </div>
+  <?php endif; ?>
 </div>
