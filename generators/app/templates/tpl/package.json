@@ -7,8 +7,9 @@
     "build": "./node_modules/.bin/gulp",
     "build-production": "./node_modules/.bin/gulp build --production",
     "install-libraries": "./node_modules/.bin/bower install",
-    "update": "npm install ; npm run install-libraries ; npm run build-production",
-    "postinstall": "find node_modules/ -name '*.info' -type f -delete ; npm run install-libraries ; npm run build-production"
+    "copy-fonts": "./node_modules/.bin/gulp copy-fonts",
+    "update": "npm install ; npm run install-libraries ; npm run copy-fonts ; npm run build-production",
+    "postinstall": "find node_modules/ -name '*.info' -type f -delete ; npm run install-libraries ; npm run copy-fonts ; npm run build-production"
   },
   "dependencies": {
     "foundation-sites": "~6.4.1",
@@ -22,6 +23,7 @@
     "babel-register": "^6.7.2",
     "bower": "^1.8.0",
     "browser-sync": "^2.10.0",
+    "font-awesome": "^4.7.0",
     "gulp": "gulpjs/gulp#4.0",
     "gulp-autoprefixer": "^3.1.0",
     "gulp-babel": "^6.1.2",

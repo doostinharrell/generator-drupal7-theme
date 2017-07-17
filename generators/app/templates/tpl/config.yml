@@ -23,6 +23,9 @@ PATHS:
   assets:
     - "src/assets/**/*"
     - "!src/assets/{img,js,scss,templates}/**/*"
+  # Paths to font file directories to be copied
+  fonts:
+    - "node_modules/font-awesome/fonts/**/*"
   # Paths to Sass libraries, which can then be loaded with @import
   sass:
     - "bower_components/font-awesome/scss"

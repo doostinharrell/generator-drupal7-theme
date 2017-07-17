@@ -33,6 +33,10 @@ gulp.task('build',
 gulp.task('default',
   gulp.series('build', server, watch));
 
+// Copy fonts out of the font folders into the source assets folder.
+gulp.task('copy-fonts',
+    gulp.series(copyFonts));
+
 // Delete the "dist" folder
 // This happens every time a build starts
 function clean(done) {
@@ -44,6 +48,12 @@ function clean(done) {
 function copy() {
   return gulp.src(PATHS.assets)
     .pipe(gulp.dest(PATHS.dist + '/assets'));
+}
+
+// Copy fonts out of the font folders into the source assets folder.
+function copyFonts() {
+  return gulp.src(PATHS.fonts)
+      .pipe(gulp.dest('src/assets/fonts'));
 }
 
 // Compile Sass into CSS
